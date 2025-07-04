@@ -1,4 +1,4 @@
-export const WEBSITE_NAME = "Smart Template";
+export const WEBSITE_NAME = "TOKONOMY";
 export const WEBSITE_DESCRIPTION = "A smart template for your Next.js projects.";
 export const WEBSITE_URL = "https://smart-template.example.com";
 export const GITHUB_REPO_URL = "https://github.com/username/smart-template";
