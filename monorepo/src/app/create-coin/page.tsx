@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAccount, useChainId, useWriteContract, useSimulateContract, useWaitForTransactionReceipt } from "wagmi";
 import { setApiKey } from "@zoralabs/coins-sdk";
 import { parseEther } from "viem";
+import toast from "react-hot-toast";
 import { base, baseSepolia } from "viem/chains";
 import { 
   DeployCurrency, 
@@ -14,7 +15,6 @@ import {
   getCoinCreateFromLogs,
   validateMetadataURIContent
 } from "@zoralabs/coins-sdk";
-import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +26,6 @@ import { Loader2, Upload, Wallet, CheckCircle, XCircle, Info, AlertCircle, Exter
 import InfoCards from "@/components/InfoCards";
 import ConnectWallet from "@/components/ConnectWallet";
 
-// Set your Zora API key
 const ZORA_API_KEY = process.env.NEXT_PUBLIC_ZORA_API_KEY || "zora_api_d66c8d3743429a5ea3f9bdc60d905a6b130a670b34d4f33519d33baf8a76c5b8";
 
 export default function CreateCoinPage() {
@@ -42,11 +41,7 @@ export default function CreateCoinPage() {
   const [contractCallParams, setContractCallParams] = useState<any>(null);
   const [metadataUri, setMetadataUri] = useState<string>("");
   const [deployedCoinAddress, setDeployedCoinAddress] = useState<string>("");
-
-  // Set API key
   setApiKey(ZORA_API_KEY);
-
-  // Contract simulation and writing
   const { data: simulation, error: simulationError } = useSimulateContract(
     contractCallParams ? {
       ...contractCallParams,
@@ -62,8 +57,7 @@ export default function CreateCoinPage() {
     error: writeError, 
     data: txHash 
   } = useWriteContract();
-
-  // Wait for transaction receipt
+  
   const { 
     data: receipt, 
     isLoading: isReceiptLoading, 
@@ -72,58 +66,32 @@ export default function CreateCoinPage() {
     hash: txHash,
   });
 
-  // Handle transaction success
   useEffect(() => {
     if (isReceiptSuccess && receipt) {
       try {
         const coinDeployment = getCoinCreateFromLogs(receipt);
         if (coinDeployment?.coin) {
           setDeployedCoinAddress(coinDeployment.coin);
-          alert("🎉 Coin created successfully!");
-          console.log(`Your coin has been deployed at ${coinDeployment.coin}`);
-          toast.success("🎉 Coin created successfully!", {
-            description: `Your coin has been deployed at ${coinDeployment.coin}`,
-            action: {
-              label: "View on Explorer",
-              onClick: () => window.open(`https://basescan.org/address/${coinDeployment.coin}`, '_blank'),
-            },
-            duration: 10000,
-          });
-          
-          // Reset form
+          alert(`🎉 Coin created successfully! Your coin has been deployed at ${coinDeployment.coin}`);
           resetForm();
         }
       } catch (error) {
         console.error("Error extracting coin address:", error);
-        toast.success("Coin created successfully!", {
-          description: `Transaction: ${txHash}`,
-          action: {
-            label: "View Transaction",
-            onClick: () => window.open(`https://basescan.org/tx/${txHash}`, '_blank'),
-          },
-        });
+        alert("❌ An error occurred while creating your coin. Please try again.");
         resetForm();
       }
     }
   }, [isReceiptSuccess, receipt, txHash]);
 
-  // Handle write errors
   useEffect(() => {
     if (isWriteError && writeError) {
-      toast.error("❌ Transaction failed", {
-        description: writeError.message,
-        duration: 8000,
-      });
+      alert(`❌ Transaction failed: ${writeError.message}`);
     }
   }, [isWriteError, writeError]);
 
-  // Handle simulation errors
   useEffect(() => {
     if (simulationError && contractCallParams) {
-      toast.error("⚠️ Transaction simulation failed", {
-        description: "Please check your parameters and try again",
-        duration: 5000,
-      });
+      alert(`❌ Simulation failed: ${simulationError.message}`);
     }
   }, [simulationError, contractCallParams]);
 
@@ -131,7 +99,7 @@ export default function CreateCoinPage() {
   useEffect(() => {
     if (isWritePending) {
       toast.loading("📝 Confirm transaction in wallet", {
-        description: "Please approve the transaction to create your coin",
+
         duration: 30000,
       });
     }
@@ -140,7 +108,6 @@ export default function CreateCoinPage() {
   useEffect(() => {
     if (isReceiptLoading) {
       toast.loading("⏳ Creating your coin...", {
-        description: "Transaction confirmed, waiting for deployment",
         duration: 60000,
       });
     }
@@ -161,21 +128,18 @@ export default function CreateCoinPage() {
     
     if (!isConnected || !address) {
       toast.error("🔒 Wallet not connected", {
-        description: "Please connect your wallet to continue",
       });
       return;
     }
 
     if (!name || !symbol || !description || !image) {
       toast.error("📝 Missing required fields", {
-        description: "Please fill in all required fields",
       });
       return;
     }
 
     if (!ZORA_API_KEY) {
       toast.error("🔑 API key missing", {
-        description: "Zora API key is required for metadata upload",
       });
       return;
     }
@@ -184,7 +148,6 @@ export default function CreateCoinPage() {
       setIsPreparingCoin(true);
       
       toast.loading("📤 Uploading metadata to IPFS...", {
-        description: "This may take a moment",
         duration: 30000,
       });
 
@@ -225,17 +188,12 @@ export default function CreateCoinPage() {
       alert("✅ Coin prepared successfully!");
 
       toast.success("✅ Coin prepared successfully!", {
-        description: "Ready to deploy on Base blockchain",
-        action: {
-          label: "View Metadata",
-          onClick: () => metadataUri && window.open(metadataUri, '_blank'),
-        },
+        duration: 5000,
       });
 
     } catch (err) {
       console.error("Error preparing coin creation:", err);
       toast.error("❌ Preparation failed", {
-        description: err instanceof Error ? err.message : "An unknown error occurred",
         duration: 8000,
       });
     } finally {
@@ -248,7 +206,6 @@ export default function CreateCoinPage() {
       writeContract(simulation.request);
     } else {
       toast.error("⚠️ Transaction not ready", {
-        description: "Please prepare the coin creation first",
       });
     }
   };
@@ -260,7 +217,6 @@ export default function CreateCoinPage() {
       // Check file size (5MB limit)
       if (file.size > 5 * 1024 * 1024) {
         toast.error("📁 File too large", {
-          description: "Please select an image smaller than 5MB",
         });
         return;
       }
@@ -268,14 +224,12 @@ export default function CreateCoinPage() {
       // Check file type
       if (!file.type.startsWith('image/')) {
         toast.error("🖼️ Invalid file type", {
-          description: "Please select a valid image file",
         });
         return;
       }
 
       setImage(file);
       toast.success("🖼️ Image selected", {
-        description: `${file.name} ready for upload`,
       });
     }
   };

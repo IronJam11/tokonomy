@@ -59,7 +59,7 @@ export default function InfoCards() {
                   <span>Community governance potential</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>);
+        </CardContent>
+        </Card>
+    </div>);
 }
