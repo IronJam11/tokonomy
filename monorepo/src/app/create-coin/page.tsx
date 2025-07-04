@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import { useAccount, useChainId, useWriteContract, useSimulateContract, useWaitForTransactionReceipt } from "wagmi";
@@ -9,11 +9,8 @@ import { base, baseSepolia } from "viem/chains";
 import { 
   DeployCurrency, 
   InitialPurchaseCurrency, 
-  createMetadataBuilder, 
-  createZoraUploaderForCreator,
   createCoinCall,
   getCoinCreateFromLogs,
-  validateMetadataURIContent
 } from "@zoralabs/coins-sdk";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,11 +19,40 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Upload, Wallet, CheckCircle, XCircle, Info, AlertCircle, ExternalLink } from "lucide-react";
+import { Loader2, Upload, Wallet, CheckCircle, XCircle, Info, AlertCircle, ExternalLink, Plus, Trash2 } from "lucide-react";
 import InfoCards from "@/components/InfoCards";
 import ConnectWallet from "@/components/ConnectWallet";
+import { uploadToIPFS } from "@/utils/pinata/upload";
 
 const ZORA_API_KEY = process.env.NEXT_PUBLIC_ZORA_API_KEY || "zora_api_d66c8d3743429a5ea3f9bdc60d905a6b130a670b34d4f33519d33baf8a76c5b8";
+
+const ASSET_TYPES = [
+  "software",
+  "video", 
+  "writing",
+  "song",
+  "artwork",
+  "photography",
+  "podcast",
+  "course",
+  "game",
+  "nft",
+  "other"
+];
+
+const LINK_PLATFORMS = [
+  "youtube",
+  "instagram", 
+  "twitter",
+  "tiktok",
+  "github",
+  "medium",
+  "substack",
+  "spotify",
+  "soundcloud",
+  "website",
+  "other"
+];
 
 export default function CreateCoinPage() {
   const { address, isConnected } = useAccount();
@@ -35,13 +61,17 @@ export default function CreateCoinPage() {
   const [symbol, setSymbol] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState<File | null>(null);
+  const [assetType, setAssetType] = useState("");
+  const [links, setLinks] = useState<Array<{platform: string, url: string}>>([]);
   const [currency, setCurrency] = useState<DeployCurrency>(DeployCurrency.ZORA);
   const [initialPurchaseAmount, setInitialPurchaseAmount] = useState("");
   const [isPreparingCoin, setIsPreparingCoin] = useState(false);
   const [contractCallParams, setContractCallParams] = useState<any>(null);
   const [metadataUri, setMetadataUri] = useState<string>("");
   const [deployedCoinAddress, setDeployedCoinAddress] = useState<string>("");
+  
   setApiKey(ZORA_API_KEY);
+  
   const { data: simulation, error: simulationError } = useSimulateContract(
     contractCallParams ? {
       ...contractCallParams,
@@ -57,7 +87,7 @@ export default function CreateCoinPage() {
     error: writeError, 
     data: txHash 
   } = useWriteContract();
-  
+
   const { 
     data: receipt, 
     isLoading: isReceiptLoading, 
@@ -72,12 +102,12 @@ export default function CreateCoinPage() {
         const coinDeployment = getCoinCreateFromLogs(receipt);
         if (coinDeployment?.coin) {
           setDeployedCoinAddress(coinDeployment.coin);
-          alert(`🎉 Coin created successfully! Your coin has been deployed at ${coinDeployment.coin}`);
+          toast.success(`🎉 Coin created successfully! Deployed at ${coinDeployment.coin}`);
           resetForm();
         }
       } catch (error) {
         console.error("Error extracting coin address:", error);
-        alert("❌ An error occurred while creating your coin. Please try again.");
+        toast.error("❌ Error creating coin");
         resetForm();
       }
     }
@@ -85,21 +115,19 @@ export default function CreateCoinPage() {
 
   useEffect(() => {
     if (isWriteError && writeError) {
-      alert(`❌ Transaction failed: ${writeError.message}`);
+      toast.error(`❌ Transaction failed: ${writeError.message}`);
     }
   }, [isWriteError, writeError]);
 
   useEffect(() => {
     if (simulationError && contractCallParams) {
-      alert(`❌ Simulation failed: ${simulationError.message}`);
+      toast.error(`❌ Simulation failed: ${simulationError.message}`);
     }
   }, [simulationError, contractCallParams]);
 
-  // Handle pending states
   useEffect(() => {
     if (isWritePending) {
       toast.loading("📝 Confirm transaction in wallet", {
-
         duration: 30000,
       });
     }
@@ -118,60 +146,106 @@ export default function CreateCoinPage() {
     setSymbol("");
     setDescription("");
     setImage(null);
+    setAssetType("");
+    setLinks([]);
     setInitialPurchaseAmount("");
     setContractCallParams(null);
     setMetadataUri("");
     setDeployedCoinAddress("");
   };
 
-  const handlePrepareCoin = async () => {
+  const addLink = () => {
+    setLinks([...links, { platform: "", url: "" }]);
+  };
+
+  const removeLink = (index: number) => {
+    setLinks(links.filter((_, i) => i !== index));
+  };
+
+  const updateLink = (index: number, field: 'platform' | 'url', value: string) => {
+    const updatedLinks = [...links];
+    updatedLinks[index][field] = value;
+    setLinks(updatedLinks);
+  };
+
+  const createCustomMetadata = async () => {
+    if (!image) throw new Error("Image is required");
     
+    // Upload image to IPFS first
+    const imageUrl = await uploadToIPFS(image);
+    
+    // Create links object
+    const linksObject: Record<string, string> = {};
+    links.forEach(link => {
+      if (link.platform && link.url) {
+        linksObject[link.platform] = link.url;
+      }
+    });
+    
+    // Create metadata object
+    const metadata = {
+      name,
+      symbol,
+      description,
+      image: imageUrl,
+      type: assetType,
+      links: linksObject,
+      attributes: [
+        {
+          trait_type: "Asset Type",
+          value: assetType
+        },
+        {
+          trait_type: "Links Count",
+          value: Object.keys(linksObject).length
+        }
+      ]
+    };
+    
+    // Upload metadata to IPFS
+    const metadataBlob = new Blob([JSON.stringify(metadata, null, 2)], {
+      type: 'application/json'
+    });
+    const metadataFile = new File([metadataBlob], 'metadata.json', {
+      type: 'application/json'
+    });
+    
+    const metadataUrl = await uploadToIPFS(metadataFile);
+    return metadataUrl;
+  };
+
+  const handlePrepareCoin = async () => {
     if (!isConnected || !address) {
-      toast.error("🔒 Wallet not connected", {
-      });
+      toast.error("🔒 Wallet not connected");
       return;
     }
-
-    if (!name || !symbol || !description || !image) {
-      toast.error("📝 Missing required fields", {
-      });
+    
+    if (!name || !symbol || !description || !image || !assetType) {
+      toast.error("📝 Please fill in all required fields");
       return;
     }
-
-    if (!ZORA_API_KEY) {
-      toast.error("🔑 API key missing", {
-      });
+    
+    // Validate links
+    const validLinks = links.filter(link => link.platform && link.url);
+    if (validLinks.length !== links.length) {
+      toast.error("🔗 Please complete all link entries or remove empty ones");
       return;
     }
-
+    
     try {
       setIsPreparingCoin(true);
       
-      toast.loading("📤 Uploading metadata to IPFS...", {
+      toast.loading("📤 Uploading to IPFS...", {
         duration: 30000,
       });
-
-      // Create metadata uploader
-      const uploader = createZoraUploaderForCreator(address as `0x${string}`);
-
-      // Create and upload metadata
-      const { createMetadataParameters } = await createMetadataBuilder()
-        .withName(name)
-        .withSymbol(symbol)
-        .withDescription(description)
-        .withImage(image)
-        .upload(uploader);
-
-      // Validate metadata URI
-      if (createMetadataParameters.uri) {
-        await validateMetadataURIContent(createMetadataParameters.uri);
-        setMetadataUri(createMetadataParameters.uri);
-      }
-
+    
+      const metadataUrl = await createCustomMetadata();
+      setMetadataUri(metadataUrl);
+      
       const coinParams = {
-        ...createMetadataParameters,
         name,
         symbol,
+        uri: metadataUrl as import("@zoralabs/coins-sdk").ValidMetadataURI,
         payoutRecipient: address as `0x${string}`,
         chainId: chainId || base.id,
         currency,
@@ -185,17 +259,11 @@ export default function CreateCoinPage() {
 
       const callParams = await createCoinCall(coinParams);
       setContractCallParams(callParams);
-      alert("✅ Coin prepared successfully!");
-
-      toast.success("✅ Coin prepared successfully!", {
-        duration: 5000,
-      });
-
+      
+      toast.success("✅ Coin prepared successfully!");
     } catch (err) {
       console.error("Error preparing coin creation:", err);
-      toast.error("❌ Preparation failed", {
-        duration: 8000,
-      });
+      toast.error(`❌ Preparation failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsPreparingCoin(false);
     }
@@ -205,32 +273,23 @@ export default function CreateCoinPage() {
     if (simulation?.request) {
       writeContract(simulation.request);
     } else {
-      toast.error("⚠️ Transaction not ready", {
-      });
+      toast.error("⚠️ Transaction not ready");
     }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      
-      // Check file size (5MB limit)
       if (file.size > 5 * 1024 * 1024) {
-        toast.error("📁 File too large", {
-        });
+        toast.error("📁 File too large (max 5MB)");
         return;
       }
-
-      // Check file type
       if (!file.type.startsWith('image/')) {
-        toast.error("🖼️ Invalid file type", {
-        });
+        toast.error("🖼️ Invalid file type");
         return;
       }
-
       setImage(file);
-      toast.success("🖼️ Image selected", {
-      });
+      toast.success("🖼️ Image selected");
     }
   };
 
@@ -241,16 +300,16 @@ export default function CreateCoinPage() {
       <div className="max-w-2xl mx-auto px-4">
         <Card className="shadow-lg">
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl ">
-              Create Your Coin
+            <CardTitle className="text-3xl">
+              Digitalize Your Asset
             </CardTitle>
             <CardDescription className="text-lg">
-              Deploy your own ERC20 token on Base via Zora Protocol
+              Create a coin representing your digital asset on Base via Zora Protocol
             </CardDescription>
           </CardHeader>
           <CardContent>
             {!isConnected ? (
-                <ConnectWallet />
+              <ConnectWallet />
             ) : (
               <>
                 {isWrongNetwork && (
@@ -261,18 +320,20 @@ export default function CreateCoinPage() {
                     </AlertDescription>
                   </Alert>
                 )}
+                
                 <div className="space-y-6">
+                  {/* Basic Info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="name">
-                        Coin Name <span className="text-red-500">*</span>
+                        Asset Name <span className="text-red-500">*</span>
                       </Label>
                       <Input
                         id="name"
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="My Awesome Coin"
+                        placeholder="My Digital Asset"
                         required
                         className="focus:ring-2 focus:ring-blue-500"
                       />
@@ -287,12 +348,30 @@ export default function CreateCoinPage() {
                         type="text"
                         value={symbol}
                         onChange={(e) => setSymbol(e.target.value.toUpperCase())}
-                        placeholder="MAC"
+                        placeholder="MDA"
                         required
                         maxLength={10}
                         className="focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="assetType">
+                      Asset Type <span className="text-red-500">*</span>
+                    </Label>
+                    <Select value={assetType} onValueChange={setAssetType}>
+                      <SelectTrigger className="focus:ring-2 focus:ring-blue-500">
+                        <SelectValue placeholder="Select asset type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {ASSET_TYPES.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type.charAt(0).toUpperCase() + type.slice(1)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="space-y-2">
@@ -303,16 +382,80 @@ export default function CreateCoinPage() {
                       id="description"
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Describe your coin's purpose and utility..."
+                      placeholder="Describe your digital asset..."
                       required
                       rows={3}
                       className="focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
+                  {/* Links Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Label>Asset Links</Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={addLink}
+                        className="flex items-center gap-2"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Add Link
+                      </Button>
+                    </div>
+                    
+                    {links.map((link, index) => (
+                      <div key={index} className="flex gap-2 items-end">
+                        <div className="flex-1">
+                          <Select 
+                            value={link.platform} 
+                            onValueChange={(value) => updateLink(index, 'platform', value)}
+                          >
+                            <SelectTrigger className="focus:ring-2 focus:ring-blue-500">
+                              <SelectValue placeholder="Platform" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {LINK_PLATFORMS.map((platform) => (
+                                <SelectItem key={platform} value={platform}>
+                                  {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex-2">
+                          <Input
+                            type="url"
+                            value={link.url}
+                            onChange={(e) => updateLink(index, 'url', e.target.value)}
+                            placeholder="https://..."
+                            className="focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeLink(index)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                    
+                    {links.length === 0 && (
+                      <p className="text-sm text-muted-foreground">
+                        Add links to your asset (YouTube, Instagram, GitHub, etc.)
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Image Upload */}
                   <div className="space-y-2">
                     <Label htmlFor="image">
-                      Coin Image <span className="text-red-500">*</span>
+                      Asset Image <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="image"
@@ -337,6 +480,7 @@ export default function CreateCoinPage() {
                     )}
                   </div>
 
+                  {/* Trading Settings */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="currency">Trading Currency</Label>
@@ -374,11 +518,12 @@ export default function CreateCoinPage() {
                     </div>
                   </div>
 
+                  {/* Action Buttons */}
                   <div className="flex space-x-4">
                     <Button
                       onClick={handlePrepareCoin}
                       disabled={isPreparingCoin || !isConnected || !!isWrongNetwork}
-                      className="flex-1 "
+                      className="flex-1"
                     >
                       {isPreparingCoin ? (
                         <>
@@ -414,11 +559,31 @@ export default function CreateCoinPage() {
                       </Button>
                     )}
                   </div>
+                  
+                  {/* Error Display */}
                   {simulationError && contractCallParams && (
                     <Alert className="border-red-200 bg-red-50">
                       <XCircle className="h-4 w-4 text-red-600" />
                       <AlertDescription className="text-red-800">
                         Transaction simulation failed. Please check your parameters.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  
+                  {/* Metadata Preview */}
+                  {metadataUri && (
+                    <Alert className="border-green-200 bg-green-50">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <AlertDescription className="text-green-800">
+                        Metadata uploaded successfully! 
+                        <a 
+                          href={metadataUri} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="ml-2 underline hover:text-green-900"
+                        >
+                          View metadata <ExternalLink className="inline h-3 w-3" />
+                        </a>
                       </AlertDescription>
                     </Alert>
                   )}
@@ -429,7 +594,6 @@ export default function CreateCoinPage() {
         </Card>
 
         <InfoCards />
-
       </div>
     </div>
   );
