@@ -5,6 +5,7 @@ import ClientProviders from "@/providers/ClientProviders";
 import { Navbar } from "@/components/navbars/navbar";
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/sidebar";
+import AIAgent from "@/components/AIAgent"; // Add this import
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,22 +34,23 @@ export default function RootLayout({
       >
         <ClientProviders>
           <SidebarProvider>
-           
-              {/* Sidebar */}
-              <AppSidebar />
+            
+            <AppSidebar />
+            <div className="flex flex-1 flex-col">
+              <Navbar />
               
-              {/* Main Content Area */}
-              <div className="flex flex-1 flex-col">
-                {/* Navbar */}
-                <Navbar />
-                
-                {/* Page Content */}
-                <main className="flex-1 overflow-auto p-6">
-                  {children}
-                </main>
-              </div>
-          
+              <main className="flex-1 overflow-auto p-6">
+                {children}
+              </main>
+            </div>
+            
           </SidebarProvider>
+          <AIAgent 
+            position="bottom-right"
+            agentName="Tokobot"
+            apiEndpoint="/api/chat"
+          />
+          
         </ClientProviders>
       </body>
     </html>
