@@ -56,7 +56,7 @@ const AIAgent: React.FC<AIAgentProps> = ({
     const baseClasses = 'fixed z-50';
     switch (position) {
       case 'bottom-right':
-        return `${baseClasses} bottom-15 right-6`;
+        return `${baseClasses} bottom-6 right-6`;
       case 'bottom-left':
         return `${baseClasses} bottom-6 left-6`;
       case 'top-right':
@@ -146,9 +146,9 @@ const AIAgent: React.FC<AIAgentProps> = ({
       // Code blocks
       .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
       // Inline code
-      .replace(/`(.*?)`/g, '<code>$1</code>')
+      .replace(/`(.*?)`/g, '<code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm">$1</code>')
       // Links
-      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>')
+      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">$1</a>')
       // Line breaks
       .replace(/\n/g, '<br/>');
 
@@ -160,12 +160,12 @@ const AIAgent: React.FC<AIAgentProps> = ({
       <div className="relative my-2">
         <button 
           onClick={() => navigator.clipboard.writeText(code)}
-          className="absolute right-2 top-2 text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded"
+          className="absolute right-2 top-2 text-xs bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded transition-colors"
         >
           Copy
         </button>
-        <pre className="bg-gray-100 p-4 rounded-md overflow-auto text-sm">
-          <code>{code}</code>
+        <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md overflow-auto text-sm border border-gray-200 dark:border-gray-700">
+          <code className="text-gray-800 dark:text-gray-200">{code}</code>
         </pre>
       </div>
     );
@@ -196,7 +196,7 @@ const AIAgent: React.FC<AIAgentProps> = ({
       <div className={getPositionClasses()}>
         <Button
           onClick={() => setIsOpen(true)}
-          className="h-16 w-16 rounded-full bg-black hover:bg-gray-800 text-white shadow-lg transition-all duration-300 hover:scale-105"
+          className="h-16 w-16 rounded-full bg-black dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-black shadow-lg transition-all duration-300 hover:scale-105"
           size="icon"
         >
           <MessageCircle className="h-7 w-7" />
@@ -207,15 +207,15 @@ const AIAgent: React.FC<AIAgentProps> = ({
 
   return (
     <div className={getPositionClasses()}>
-      <Card className={`w-[500px] ${isMinimized ? 'h-[90px]' : 'h-[600px]'} bg-white border-gray-200 shadow-2xl transition-all duration-300 ${isMinimized ? 'overflow-hidden' : ''}`}>
-        <CardHeader className="flex flex-row items-center justify-between p-4 bg-gray-50 border-b border-gray-200">
+      <Card className={`w-[500px] ${isMinimized ? 'h-[90px]' : 'h-[600px]'} bg-white dark:bg-black border-gray-200 dark:border-gray-800 shadow-2xl transition-all duration-300 ${isMinimized ? 'overflow-hidden' : ''}`}>
+        <CardHeader className="flex flex-row items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center space-x-3">
-            <div className="h-10 w-10 bg-black rounded-full flex items-center justify-center">
-              <Bot className="h-5 w-5 text-white" />
+            <div className="h-10 w-10 bg-black dark:bg-white rounded-full flex items-center justify-center">
+              <Bot className="h-5 w-5 text-white dark:text-black" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-lg">{agentName}</h3>
-              <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+              <h3 className="font-semibold text-gray-900 dark:text-white text-lg">{agentName}</h3>
+              <Badge variant="outline" className="text-xs bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800">
                 Online
               </Badge>
             </div>
@@ -225,7 +225,7 @@ const AIAgent: React.FC<AIAgentProps> = ({
               variant="ghost"
               size="sm"
               onClick={() => setIsMinimized(!isMinimized)}
-              className="h-9 w-9 p-0 hover:bg-gray-200"
+              className="h-9 w-9 p-0 hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400"
             >
               {isMinimized ? <Maximize2 className="h-5 w-5" /> : <Minimize2 className="h-5 w-5" />}
             </Button>
@@ -233,7 +233,7 @@ const AIAgent: React.FC<AIAgentProps> = ({
               variant="ghost"
               size="sm"
               onClick={() => setIsOpen(false)}
-              className="h-9 w-9 p-0 hover:bg-gray-200"
+              className="h-9 w-9 p-0 hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400"
             >
               <X className="h-5 w-5" />
             </Button>
@@ -249,18 +249,18 @@ const AIAgent: React.FC<AIAgentProps> = ({
                   className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}
                 >
                   <div className={`flex items-start space-x-3 max-w-[85%] ${msg.isUser ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                    <div className={`h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 ${msg.isUser ? 'bg-gray-200' : 'bg-black'}`}>
+                    <div className={`h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 ${msg.isUser ? 'bg-gray-200 dark:bg-gray-700' : 'bg-black dark:bg-white'}`}>
                       {msg.isUser ? (
-                        <User className="h-5 w-5 text-gray-600" />
+                        <User className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                       ) : (
-                        <Bot className="h-5 w-5 text-white" />
+                        <Bot className="h-5 w-5 text-white dark:text-black" />
                       )}
                     </div>
-                    <div className={`rounded-lg p-4 ${msg.isUser ? 'bg-gray-100 text-gray-900' : 'bg-black text-white'}`}>
+                    <div className={`rounded-lg p-4 ${msg.isUser ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white' : 'bg-black dark:bg-white text-white dark:text-black'}`}>
                       <div className="text-sm max-w-none">
                         {renderMessageContent(msg.text, msg.isUser)}
                       </div>
-                      <p className={`text-xs mt-2 ${msg.isUser ? 'text-gray-500' : 'text-gray-400'}`}>
+                      <p className={`text-xs mt-2 ${msg.isUser ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400 dark:text-gray-600'}`}>
                         {formatTime(msg.timestamp)}
                       </p>
                     </div>
@@ -271,17 +271,17 @@ const AIAgent: React.FC<AIAgentProps> = ({
               {isTyping && (
                 <div className="flex justify-start">
                   <div className="flex items-start space-x-3 max-w-[85%]">
-                    <div className="h-10 w-10 bg-black rounded-full flex items-center justify-center flex-shrink-0">
-                      <Bot className="h-5 w-5 text-white" />
+                    <div className="h-10 w-10 bg-black dark:bg-white rounded-full flex items-center justify-center flex-shrink-0">
+                      <Bot className="h-5 w-5 text-white dark:text-black" />
                     </div>
-                    <div className="bg-black text-white rounded-lg p-4">
+                    <div className="bg-black dark:bg-white text-white dark:text-black rounded-lg p-4">
                       <div className="flex items-center space-x-1">
                         <span className="text-sm mr-2">Typing</span>
                         <div className="flex space-x-1">
                           {[...Array(3)].map((_, i) => (
                             <div 
                               key={i}
-                              className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                              className="w-2 h-2 bg-gray-400 dark:bg-gray-600 rounded-full animate-bounce"
                               style={{ animationDelay: `${i * 0.1}s` }}
                             />
                           ))}
@@ -294,7 +294,7 @@ const AIAgent: React.FC<AIAgentProps> = ({
               <div ref={messagesEndRef} />
             </div>
 
-            <div className="border-t border-gray-200 p-4">
+            <div className="border-t border-gray-200 dark:border-gray-800 p-4">
               <div className="flex space-x-3">
                 <input
                   ref={inputRef}
@@ -303,14 +303,14 @@ const AIAgent: React.FC<AIAgentProps> = ({
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Type your message..."
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                  className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent text-sm bg-white dark:bg-black text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                   disabled={isLoading}
                 />
                 <Button
                   onClick={sendMessage}
                   disabled={isLoading || !input.trim()}
                   size="sm"
-                  className="bg-black hover:bg-gray-800 text-white px-5 h-11"
+                  className="bg-black dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-black px-5 h-11 transition-all duration-200 hover:scale-105"
                 >
                   <Send className="h-5 w-5" />
                 </Button>
