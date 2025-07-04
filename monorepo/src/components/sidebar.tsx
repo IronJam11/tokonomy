@@ -107,9 +107,9 @@ export function AppSidebar() {
         <SidebarHeader className="border-b px-6 py-4">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <span className="text-sm font-bold">A</span>
+              <span className="text-sm font-bold"><img src="/tokonomy-logo.png" alt="Tokonomy Logo" /></span>
             </div>
-            <span className="text-lg font-semibold">AppName</span>
+            <span className="text-lg font-semibold">Tokonomy</span>
           </div>
         </SidebarHeader>
 

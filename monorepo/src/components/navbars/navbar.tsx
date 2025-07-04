@@ -18,18 +18,18 @@ import { WEBSITE_LOGO_PATH as LOGO_PATH, WEBSITE_NAME, WEBSITE_TITLE_FONT as WEB
 
 export function Navbar() {
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="sticky top-0 h-18 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center px-4">
         <div className="flex items-center space-x-3">
           <Link href="/" className="flex items-center space-x-3">
             <Image 
               src={LOGO_PATH} 
               alt="Logo" 
-              width={32} 
-              height={32}
-              className="w-8 h-8"
+              width={120} 
+              height={120}
+              className="w-20 h-20"
             />
-            <span className={`text-xl font-bold ${WEBSITE_FONT}`}>
+            <span className={`text-4xl text-foreground font-bold ${WEBSITE_FONT}`}>
               {WEBSITE_NAME}
             </span>
           </Link>
