@@ -23,37 +23,10 @@ import { Loader2, Upload, Wallet, CheckCircle, XCircle, Info, AlertCircle, Exter
 import InfoCards from "@/components/InfoCards";
 import ConnectWallet from "@/components/ConnectWallet";
 import { uploadToIPFS } from "@/utils/pinata/upload";
+import { ASSET_TYPES } from "@/utils/constants/add-coin/assetTypes";
+import { LINK_PLATFORMS } from "@/utils/constants/add-coin/linkPlatforms";
 
 const ZORA_API_KEY = process.env.NEXT_PUBLIC_ZORA_API_KEY || "zora_api_d66c8d3743429a5ea3f9bdc60d905a6b130a670b34d4f33519d33baf8a76c5b8";
-
-const ASSET_TYPES = [
-  "software",
-  "video", 
-  "writing",
-  "song",
-  "artwork",
-  "photography",
-  "podcast",
-  "course",
-  "game",
-  "nft",
-  "other"
-];
-
-const LINK_PLATFORMS = [
-  "youtube",
-  "instagram", 
-  "twitter",
-  "tiktok",
-  "github",
-  "medium",
-  "substack",
-  "spotify",
-  "soundcloud",
-  "website",
-  "other"
-];
-
 export default function CreateCoinPage() {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
@@ -220,7 +193,6 @@ export default function CreateCoinPage() {
       return;
     }
     
-    // Validate links
     const validLinks = links.filter(link => link.platform && link.url);
     if (validLinks.length !== links.length) {
       toast.error("🔗 Please complete all link entries or remove empty ones");

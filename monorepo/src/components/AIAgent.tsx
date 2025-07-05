@@ -5,6 +5,7 @@ import { MessageCircle, X, Send, Minimize2, Maximize2, Bot, User } from 'lucide-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useModal } from '@/providers/ModalProvider';
 
 interface Message {
   text: string;
@@ -23,6 +24,7 @@ const AIAgent: React.FC<AIAgentProps> = ({
   apiEndpoint = '/api/chat',
   agentName = 'AI Assistant'
 }) => {
+  const { openCreateCoinModal } = useModal();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -37,6 +39,7 @@ const AIAgent: React.FC<AIAgentProps> = ({
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -92,8 +95,11 @@ const AIAgent: React.FC<AIAgentProps> = ({
 
       const data = await response.json();
       console.log(data);
+      if(data.response_type == 'create-coin') {
+        console.log(data.data);
+        openCreateCoinModal(data.data);
+      }
    
-      
       setTimeout(() => {
         setIsTyping(false);
         if (response) {

@@ -41,6 +41,7 @@ import { Toaster } from 'react-hot-toast';
 import '@rainbow-me/rainbowkit/styles.css';
 import '@/components/theme-provider';
 import { ThemeProvider } from '@/components/theme-provider';
+import { ModalProvider } from './ModalProvider';
 
 const chains = [mainnet, polygon, optimism, arbitrum, base, sepolia, baseSepolia] as const;
 
@@ -167,12 +168,8 @@ customTheme.colors.standby = '#ffaa00';
 
 export default function ClientProviders({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange>
       <WagmiProvider config={wagmiConfig}>
+       
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider
             theme={customTheme}
@@ -181,7 +178,9 @@ export default function ClientProviders({ children }: { children: ReactNode }) {
             showRecentTransactions={true}
             coolMode={true}
           >
+            <ModalProvider>
             {children}
+             </ModalProvider>
             <Toaster
               position="top-right"
               toastOptions={{
@@ -236,7 +235,10 @@ export default function ClientProviders({ children }: { children: ReactNode }) {
             />
           </RainbowKitProvider>
         </QueryClientProvider>
+       
       </WagmiProvider>
-    </ThemeProvider>
+
+  
+   
   );
 }
