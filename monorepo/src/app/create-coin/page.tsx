@@ -170,11 +170,7 @@ export default function CreateCoinPage() {
 
   const createCustomMetadata = async () => {
     if (!image) throw new Error("Image is required");
-    
-    // Upload image to IPFS first
     const imageUrl = await uploadToIPFS(image);
-    
-    // Create links object
     const linksObject: Record<string, string> = {};
     links.forEach(link => {
       if (link.platform && link.url) {
@@ -182,7 +178,6 @@ export default function CreateCoinPage() {
       }
     });
     
-    // Create metadata object
     const metadata = {
       name,
       symbol,

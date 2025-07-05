@@ -91,12 +91,14 @@ const AIAgent: React.FC<AIAgentProps> = ({
       });
 
       const data = await response.json();
+      console.log(data);
+   
       
       setTimeout(() => {
         setIsTyping(false);
-        if (response.ok) {
+        if (response) {
           const botMessage: Message = { 
-            text: data.response, 
+            text: data.message, 
             isUser: false, 
             timestamp: new Date() 
           };
