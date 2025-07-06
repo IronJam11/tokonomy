@@ -109,7 +109,6 @@ export default function CoinDetailsPage() {
     }
   };
 
-  // Fetch coin comments
   const fetchCoinComments = async () => {
     if (!isValidAddress) return;
 
