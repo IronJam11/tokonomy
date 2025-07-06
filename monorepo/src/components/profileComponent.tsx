@@ -112,8 +112,6 @@ export default function ProfilePage({ userAddress }: { userAddress: string }) {
       setLoading(false);
     }
   };
-
-  // Fetch user balances
   const fetchBalances = async () => {
     if (!isValidIdentifier) return;
 

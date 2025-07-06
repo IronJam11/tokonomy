@@ -37,17 +37,17 @@ import { Button } from "@/components/ui/button"
 
 const mainNavItems = [
   {
-    title: "Dashboard",
+    title: "Coin explorer",
     icon: Home,
-    url: "/dashboard",
+    url: "/coin-explorer",
   },
   {
     title: "Users",
     icon: Users,
     url: "/users",
     items: [
-      { title: "All Users", url: "/users" },
-      { title: "Add User", url: "/users/new" },
+      { title: "Your Profile", url: "/profile" },
+      { title: "User Profile Search", url: "/users/new" },
       { title: "User Roles", url: "/users/roles" },
     ],
   },

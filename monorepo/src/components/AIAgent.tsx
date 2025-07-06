@@ -6,18 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useModal } from '@/providers/ModalProvider';
-
-interface Message {
-  text: string;
-  isUser: boolean;
-  timestamp: Date;
-}
-
-interface AIAgentProps {
-  position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
-  apiEndpoint?: string;
-  agentName?: string;
-}
+import { formatTime } from '@/utils/formatTime';
+import { Message, AIAgentProps } from '@/utils/interfaces';
+import { renderMessageContent } from '@/utils/renderMD';
+import { getPositionClasses } from '@/utils/getPositionClass';
 
 const AIAgent: React.FC<AIAgentProps> = ({
   position = 'bottom-right',
@@ -40,7 +32,6 @@ const AIAgent: React.FC<AIAgentProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -54,22 +45,6 @@ const AIAgent: React.FC<AIAgentProps> = ({
       inputRef.current?.focus();
     }
   }, [isOpen, isMinimized]);
-
-  const getPositionClasses = () => {
-    const baseClasses = 'fixed z-50';
-    switch (position) {
-      case 'bottom-right':
-        return `${baseClasses} bottom-6 right-6`;
-      case 'bottom-left':
-        return `${baseClasses} bottom-6 left-6`;
-      case 'top-right':
-        return `${baseClasses} top-6 right-6`;
-      case 'top-left':
-        return `${baseClasses} top-6 left-6`;
-      default:
-        return `${baseClasses} bottom-6 right-6`;
-    }
-  };
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -92,14 +67,26 @@ const AIAgent: React.FC<AIAgentProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: currentInput }),
       });
-
       const data = await response.json();
       console.log(data);
       if(data.response_type == 'create-coin') {
         console.log(data.data);
         openCreateCoinModal(data.data);
       }
-   
+
+      if(data.response_type == 'token-research') {
+        let tokenAddress = data.data.address;
+        let type = data.data.target;
+        console.log(tokenAddress, type);
+
+        if(type == 'token') {
+          window.location.href = `coin/${tokenAddress}`;
+        }
+        else if(type == 'creator') {
+          window.location.href = `profile/${tokenAddress}`;
+        }
+      }
+
       setTimeout(() => {
         setIsTyping(false);
         if (response) {
@@ -139,69 +126,9 @@ const AIAgent: React.FC<AIAgentProps> = ({
       sendMessage();
     }
   };
-
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
-  const formatText = (text: string) => {
-    // Basic markdown-like formatting
-    let formatted = text
-      // Bold
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      // Italics
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      // Code blocks
-      .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-      // Inline code
-      .replace(/`(.*?)`/g, '<code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm">$1</code>')
-      // Links
-      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">$1</a>')
-      // Line breaks
-      .replace(/\n/g, '<br/>');
-
-    return { __html: formatted };
-  };
-
-  const renderCodeBlock = (code: string) => {
-    return (
-      <div className="relative my-2">
-        <button 
-          onClick={() => navigator.clipboard.writeText(code)}
-          className="absolute right-2 top-2 text-xs bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded transition-colors"
-        >
-          Copy
-        </button>
-        <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md overflow-auto text-sm border border-gray-200 dark:border-gray-700">
-          <code className="text-gray-800 dark:text-gray-200">{code}</code>
-        </pre>
-      </div>
-    );
-  };
-
-  const renderMessageContent = (text: string, isUser: boolean) => {
-    if (isUser) {
-      return text;
-    }
-
-    // Check for code blocks first
-    const codeBlockMatch = text.match(/```[\s\S]*?```/);
-    if (codeBlockMatch) {
-      const codeContent = codeBlockMatch[0].replace(/```/g, '').trim();
-      return (
-        <>
-          <div dangerouslySetInnerHTML={formatText(text.replace(/```[\s\S]*?```/, ''))} />
-          {renderCodeBlock(codeContent)}
-        </>
-      );
-    }
-
-    return <div dangerouslySetInnerHTML={formatText(text)} />;
-  };
-
   if (!isOpen) {
     return (
-      <div className={getPositionClasses()}>
+      <div className={getPositionClasses(position)}>
         <Button
           onClick={() => setIsOpen(true)}
           className="h-16 w-16 rounded-full bg-black dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-black shadow-lg transition-all duration-300 hover:scale-105"
@@ -212,9 +139,8 @@ const AIAgent: React.FC<AIAgentProps> = ({
       </div>
     );
   }
-
   return (
-    <div className={getPositionClasses()}>
+    <div className={getPositionClasses(position)}>
       <Card className={`w-[500px] ${isMinimized ? 'h-[90px]' : 'h-[600px]'} bg-white dark:bg-black border-gray-200 dark:border-gray-800 shadow-2xl transition-all duration-300 ${isMinimized ? 'overflow-hidden' : ''}`}>
         <CardHeader className="flex flex-row items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center space-x-3">

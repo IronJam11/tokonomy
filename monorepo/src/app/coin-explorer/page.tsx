@@ -212,18 +212,17 @@ const CoinCard: React.FC<{ coin: Coin; showDelta?: boolean }> = ({ coin, showDel
             <span className="text-muted-foreground">Creator:</span>
             <span className="font-medium">{coin.creatorAddress}</span>
           </div>
-          <div className="flex justify-between">
-            <Link href={`/coin/${coin.address}`} className="text-blue-500 hover:underline">
-              <span className="text-muted-foreground">View details</span>
-            </Link>
-          </div>
+         <div className="flex justify-center">
+          <Link href={`/coin/${coin.address}`} className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+            <span>View details</span>
+          </Link>
+        </div>
         </div>
       </CardContent>
     </Card>
   );
 };
 
-// Main component
 const CoinsExplorer: React.FC = () => {
   const { data, loading, error, refetch } = useCoinsData();
 
