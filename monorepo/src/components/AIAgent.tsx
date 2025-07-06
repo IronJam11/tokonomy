@@ -80,10 +80,10 @@ const AIAgent: React.FC<AIAgentProps> = ({
         console.log(tokenAddress, type);
 
         if(type == 'token') {
-          window.location.href = `coin/${tokenAddress}`;
+          window.location.href = `/coin/${tokenAddress}`;
         }
         else if(type == 'creator') {
-          window.location.href = `profile/${tokenAddress}`;
+          window.location.href = `/profile/${tokenAddress}`;
         }
       }
 

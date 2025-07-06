@@ -60,7 +60,6 @@ export default function ZoraCoinsPage() {
     '0x0987654321098765432109876543210987654321'
   ]);
 
-  // Fetch single coin
   const fetchSingleCoin = async () => {
     setLoading(true);
     setError(null);

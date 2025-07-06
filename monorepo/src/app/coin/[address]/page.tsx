@@ -71,7 +71,7 @@ export default function CoinDetailsPage() {
     try {
       const response = await getCoin({
         address: coinAddress as Address,
-        chain: base.id,
+        chain: baseSepolia.id,
       });
 
       const coinData = response.data?.zora20Token;
