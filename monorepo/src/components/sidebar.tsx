@@ -31,6 +31,7 @@ import {
   ChevronLeft,
   LogOut,
   HelpCircle,
+  BatteryPlusIcon,
 } from "lucide-react"
 
 import { useAccount, useChainId } from "wagmi";
@@ -54,30 +55,28 @@ const mainNavItems = [
     ],
   },
   {
-    title: "Documents",
+    title: "Coins",
     icon: FileText,
-    url: "/documents",
+    url: "/coin",
     items: [
-      { title: "All Documents", url: "/documents" },
-      { title: "Recent", url: "/documents/recent" },
-      { title: "Shared", url: "/documents/shared" },
+      { title: "Explore coins", url: "/coin" },
+      { title: "Create coin", url: "/create-coin" },
     ],
   },
   {
-    title: "Analytics",
-    icon: BarChart3,
-    url: "/analytics",
+    title: "Tokebot",
+    icon: BatteryPlusIcon,
+    url: "/chatbot",
+    items: [
+      { title: "Chatbot Sonnet", url: "/chatbot" },
+      { title: "Yap coin", url: "/create-coin" },
+    ],
   },
   {
     title: "Messages",
     icon: Mail,
     url: "/messages",
     badge: "12",
-  },
-  {
-    title: "Calendar",
-    icon: Calendar,
-    url: "/calendar",
   },
 ]
 

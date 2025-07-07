@@ -54,11 +54,6 @@ export default function ZoraCoinsPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [coinAddress, setCoinAddress] = useState('0x445e9c0a296068dc4257767b5ed354b77cf513de');
-  const [multipleAddresses, setMultipleAddresses] = useState([
-    '0x445e9c0a296068dc4257767b5ed354b77cf513de',
-    '0x1234567890123456789012345678901234567890',
-    '0x0987654321098765432109876543210987654321'
-  ]);
 
   const fetchSingleCoin = async () => {
     setLoading(true);
@@ -103,39 +98,6 @@ export default function ZoraCoinsPage() {
     }
   };
 
-  const fetchMultipleCoins = async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const response = await getCoins({
-        coins: multipleAddresses.map(address => ({
-          chainId: base.id,
-          collectionAddress: address,
-        })),
-      });
-
-      const coins = response.data?.zora20Tokens || [];
-      setMultipleCoins(coins.map((coin: any) => ({
-        name: coin.name,
-        symbol: coin.symbol,
-        description: coin.description,
-        totalSupply: coin.totalSupply,
-        marketCap: coin.marketCap,
-        volume24h: coin.volume24h,
-        creatorAddress: coin.creatorAddress,
-        createdAt: coin.createdAt,
-        uniqueHolders: coin.uniqueHolders,
-        mediaContent: coin.mediaContent,
-      })));
-    } catch (err: any) {
-      setError(`Error fetching multiple coins: ${err.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fetch coin comments
   const fetchCoinComments = async () => {
     setLoading(true);
     setError(null);
@@ -212,26 +174,11 @@ export default function ZoraCoinsPage() {
     }
   };
 
-  const addAddress = () => {
-    setMultipleAddresses([...multipleAddresses, '']);
-  };
-
-  const removeAddress = (index: number) => {
-    const newAddresses = multipleAddresses.filter((_, i) => i !== index);
-    setMultipleAddresses(newAddresses);
-  };
-
-  const updateAddress = (index: number, value: string) => {
-    const newAddresses = [...multipleAddresses];
-    newAddresses[index] = value;
-    setMultipleAddresses(newAddresses);
-  };
-
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">Zora Coins SDK</h1>
-        <p className="text-muted-foreground">Explore and interact with Zora coins using the official SDK</p>
+        <h1 className="text-4xl font-bold mb-2">Find your next coin </h1>
+        <p className="text-muted-foreground">Buy coins that you think can shoot up</p>
       </div>
       
       {error && (
@@ -240,7 +187,6 @@ export default function ZoraCoinsPage() {
         </Alert>
       )}
 
-      {/* Single Coin Section */}
       <Card className="mb-8">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -324,82 +270,7 @@ export default function ZoraCoinsPage() {
       </Card>
 
       {/* Multiple Coins Section */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5" />
-            Multiple Coins
-          </CardTitle>
-          <CardDescription>
-            Fetch information about multiple coins at once
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            {multipleAddresses.map((address, index) => (
-              <div key={index} className="flex gap-2">
-                <Input
-                  value={address}
-                  onChange={(e) => updateAddress(index, e.target.value)}
-                  placeholder="Enter coin address"
-                  className="flex-1"
-                />
-                <Button
-                  onClick={() => removeAddress(index)}
-                  variant="outline"
-                  size="icon"
-                  disabled={multipleAddresses.length <= 1}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
-          
-          <div className="flex gap-2">
-            <Button onClick={addAddress} variant="outline" size="sm">
-              <Plus className="w-4 h-4 mr-1" />
-              Add Address
-            </Button>
-            <Button onClick={fetchMultipleCoins} disabled={loading}>
-              {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-              Fetch Multiple Coins
-            </Button>
-          </div>
-          
-          {multipleCoins.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-              {multipleCoins.map((coin, index) => (
-                <Card key={index}>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-2">
-                      <CardTitle className="text-lg">{coin.name}</CardTitle>
-                      <Badge variant="secondary">{coin.symbol}</Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Market Cap</span>
-                      <span className="text-sm font-medium">{coin.marketCap}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">24h Volume</span>
-                      <span className="text-sm font-medium">{coin.volume24h}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Holders</span>
-                      <span className="text-sm font-medium flex items-center gap-1">
-                        <Users className="w-3 h-3" />
-                        {coin.uniqueHolders}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      
 
       {/* Comments Section */}
       <Card>
