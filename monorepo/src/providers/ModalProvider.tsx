@@ -14,9 +14,23 @@ interface CoinData {
   currency?: string;
   initialPurchaseAmount?: string;
 }
+interface CoinPredictiveAnalysis {
+  opportunities?: string[],
+  prediction_type?:string,
+  riskFactors?: string[],
+  timeframe?: string,
+  successProbability?: string;
+}
+
+interface CoinAnalysis {
+  analysisAspects?: string[],
+  coinPotential?:string,
+  strengths?: string[],
+  weaknesses?: string,
+}
 
 interface ModalContextType {
-  openCreateCoinModal: (data?: CoinData) => void;
+  openCreateCoinModal: (data?: CoinData, coinPredictiveAnalysis?: CoinPredictiveAnalysis, coinAnalysis?: CoinAnalysis) => void;
   closeModal: () => void;
   isModalOpen: boolean;
 }
@@ -38,11 +52,15 @@ interface ModalProviderProps {
 export const ModalProvider = ({ children }: ModalProviderProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [coinData, setCoinData] = useState<CoinData>({});
+  const [coinPredictiveAnalysis, setCoinPredictiveAnalysis] = useState<CoinPredictiveAnalysis>({});
+  const [coinAnalysis, setCoinAnalysis] = useState<CoinAnalysis>({});
 
 
 
-  const openCreateCoinModal = (data: CoinData = {}) => {
+  const openCreateCoinModal = (data: CoinData = {}, coinPredictiveAnalysis?: CoinPredictiveAnalysis, coinAnalysis?: CoinAnalysis) => {
     setCoinData(data);
+    setCoinPredictiveAnalysis(coinPredictiveAnalysis || {});
+    setCoinAnalysis(coinAnalysis || {});
     setIsModalOpen(true);
   };
 
@@ -58,6 +76,8 @@ export const ModalProvider = ({ children }: ModalProviderProps) => {
         isOpen={isModalOpen}
         onClose={closeModal}
         initialData={coinData}
+        coinPredictiveAnalysis={coinPredictiveAnalysis}
+        coinAnalysis={coinAnalysis}
         trigger={undefined}
       />
     </ModalContext.Provider>

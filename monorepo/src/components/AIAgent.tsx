@@ -71,7 +71,7 @@ const AIAgent: React.FC<AIAgentProps> = ({
       console.log(data);
       if(data.response_type == 'create-coin') {
         console.log(data.data);
-        openCreateCoinModal(data.data);
+        openCreateCoinModal(data.data,data['predict-performance'],data['analyze-content']);
       }
 
       if(data.response_type == 'token-research') {

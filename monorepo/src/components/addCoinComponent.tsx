@@ -23,33 +23,18 @@ import { Loader2, Upload, CheckCircle, XCircle, AlertCircle, ExternalLink, Plus,
 import { uploadToIPFS } from "@/utils/pinata/upload";
 import { ASSET_TYPES } from "@/utils/constants/add-coin/assetTypes";
 import { LINK_PLATFORMS } from "@/utils/constants/add-coin/linkPlatforms";
+import { DEFAULT_IMAGE_DATA_URL } from "@/utils/constants/addCoinConstants";
+import { CreateCoinModalProps, CoinPredictiveAnalysis, CoinAnalysis } from "@/utils/interfaces";
+import AIAnalysisComponent from "./AIAnalysisComponent";
 
-const ZORA_API_KEY = process.env.NEXT_PUBLIC_ZORA_API_KEY || "zora_api_d66c8d3743429a5ea3f9bdc60d905a6b130a670b34d4f33519d33baf8a76c5b8";
+const ZORA_API_KEY = process.env.NEXT_PUBLIC_ZORA_API_KEY;
 
-// Default image data URL (a simple placeholder)
-const DEFAULT_IMAGE_DATA_URL = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNTBDMTI3LjYxNCA1MCAjNTAgNzIuMzg1OCA1MCA5MFYxMTBDNTAgMTI3LjYxNCA3Mi4zODU4IDE1MCA5MCAxNTBIMTEwQzEyNy42MTQgMTUwIDE1MCAxMjcuNjE0IDE1MCAxMTBWOTBDMTUwIDcyLjM4NTggMTI3LjYxNCA1MCAxMTAgNTBIMTAwWiIgZmlsbD0iIzk0QTNBOCIvPgo8cGF0aCBkPSJNODAgNzBDODUuNTIyOCA3MCA5MCA3NC40NzcyIDkwIDgwQzkwIDg1LjUyMjggODUuNTIyOCA5MCA4MCA5MEM3NC40NzcyIDkwIDcwIDg1LjUyMjggNzAgODBDNzAgNzQuNDc3MiA3NC40NzcyIDcwIDgwIDcwWiIgZmlsbD0iIzY4NzY4QSIvPgo8cGF0aCBkPSJNNzAgMTMwTDkwIDExMEwxMTAgMTMwTDEzMCAxMTBMMTUwIDEzMFYxNDBDMTUwIDEzNy43OTkgMTQ4LjIwMSAxMzYgMTQ2IDEzNkg1NEM1MS43OTkgMTM2IDUwIDEzNy43OTkgNTAgMTQwVjEzMEg3MFoiIGZpbGw9IiM2ODc2OEEiLz4KPC9zdmc+";
 
-interface CreateCoinModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  initialData?: {
-    name?: string;
-    symbol?: string;
-    description?: string;
-    image?: File | null;
-    assetType?: string;
-    links?: Array<{platform: string, url: string}>;
-  };
-  trigger?: React.ReactNode;
-}
-
-export default function CreateCoinModal({ isOpen, onClose, initialData, trigger }: CreateCoinModalProps) {
-  // Initialize API key on mount
+export default function CreateCoinModal({ isOpen, onClose, initialData, trigger, coinPredictiveAnalysis, coinAnalysis}: CreateCoinModalProps) {
   useEffect(() => {
     setApiKey(ZORA_API_KEY);
   }, []);
 
-  // All state hooks - these must be called consistently
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
   const [description, setDescription] = useState("");
@@ -63,17 +48,14 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger 
   const [metadataUri, setMetadataUri] = useState<string>("");
   const [deployedCoinAddress, setDeployedCoinAddress] = useState<string>("");
   const [useDefaultImage, setUseDefaultImage] = useState(true);
-  
-  // Refs to track toast IDs and prevent duplicate toasts
   const toastIds = useRef<{[key: string]: string}>({});
   const hasProcessedReceipt = useRef(false);
   const hasProcessedError = useRef(false);
-  
-  // All wagmi hooks - these must be called consistently
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
-  
-  // Prepare simulation config - useMemo to prevent recreation
+  const [CoinPredictionAnalysis, setCoinPredictionAnalysis] = useState<CoinPredictiveAnalysis | null>(null); 
+  const [CoinAnalysis, setCoinAnalysis] = useState<CoinAnalysis | null>(null);
+
   const simulationConfig = useMemo(() => {
     if (!contractCallParams || !address) return undefined;
     return {
@@ -101,7 +83,6 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger 
     hash: txHash,
   });
 
-  // Memoize callbacks to prevent recreation
   const addLink = useCallback(() => {
     setLinks(prev => [...prev, { platform: "", url: "" }]);
   }, []);
@@ -132,7 +113,6 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger 
       imageFile = image;
       imageUrl = await uploadToIPFS(imageFile);
     } else {
-      // Use default image
       imageFile = await createDefaultImageFile();
       imageUrl = await uploadToIPFS(imageFile);
     }
@@ -162,8 +142,6 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger 
         }
       ]
     };
-    
-    // Upload metadata to IPFS
     const metadataBlob = new Blob([JSON.stringify(metadata, null, 2)], {
       type: 'application/json'
     });
@@ -185,8 +163,6 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger 
       toast.error("📝 Please fill in all required fields");
       return;
     }
-    
-    // Validate links
     const validLinks = links.filter(link => link.platform && link.url);
     if (validLinks.length !== links.length) {
       toast.error("🔗 Please complete all link entries or remove empty ones");
@@ -231,7 +207,6 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger 
 
   const handleCreateCoin = useCallback(() => {
     if (simulation?.request) {
-      // Reset processing flags
       hasProcessedReceipt.current = false;
       hasProcessedError.current = false;
       writeContract(simulation.request);
@@ -267,7 +242,6 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger 
     onClose();
   }, [onClose]);
 
-  // Initialize/reset form when modal opens - FIXED: removed dependency on initialData properties
   useEffect(() => {
     if (isOpen) {
       if (initialData) {
@@ -368,6 +342,11 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger 
             </AlertDescription>
           </Alert>
         )}
+
+        <AIAnalysisComponent 
+        coinPredictiveAnalysis={coinPredictiveAnalysis}
+        coinAnalysis={coinAnalysis}
+        />
         
         {/* Basic Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -498,8 +477,6 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger 
             </p>
           )}
         </div>
-
-        {/* Image Upload */}
         <div className="space-y-2">
           <Label htmlFor="image">
             Asset Image {useDefaultImage && <span className="text-sm text-muted-foreground">(Using default image)</span>}
@@ -538,8 +515,6 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger 
             </div>
           )}
         </div>
-
-        {/* Trading Settings */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="currency">Trading Currency</Label>
@@ -576,8 +551,6 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger 
             </p>
           </div>
         </div>
-
-        {/* Action Buttons */}
         <div className="flex space-x-4">
           <Button
             onClick={handlePrepareCoin}
@@ -618,8 +591,6 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger 
             </Button>
           )}
         </div>
-        
-        {/* Error Display */}
         {simulationError && contractCallParams && (
           <Alert className="border-red-200 bg-red-50">
             <XCircle className="h-4 w-4 text-red-600" />
@@ -629,7 +600,6 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger 
           </Alert>
         )}
         
-        {/* Metadata Preview */}
         {metadataUri && (
           <Alert className="border-green-200 bg-green-50">
             <CheckCircle className="h-4 w-4 text-green-600" />
