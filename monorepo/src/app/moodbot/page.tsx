@@ -11,13 +11,11 @@ interface Message {
   timestamp: Date;
 }
 
-// Utility functions
 const formatTime = (date: Date): string => {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
 
 const renderMessageContent = (text: string, isUser: boolean) => {
-  // Simple markdown-like rendering for links and basic formatting
   const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
   const parts = text.split(linkRegex);
   
@@ -49,7 +47,7 @@ export default function ChatbotPage() {
   const { openCreateCoinModal } = useModal();
   const [messages, setMessages] = useState<Message[]>([
     {
-      text: `Hi! I'm your Tokebot. How can I help you today?`,
+      text: `Hi! I'm your Tokebot (Mood version). Tell me about your day and I will make a coin about it, tell me about experiences, I will make a coin about it. Share away!`,
       isUser: false,
       timestamp: new Date()
     }
@@ -88,7 +86,7 @@ export default function ChatbotPage() {
     setIsTyping(true);
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch('/api/moodbot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: currentInput }),
@@ -176,7 +174,7 @@ export default function ChatbotPage() {
                   <Bot className="h-5 w-5 text-white dark:text-black" />
                 </div>
                 <div>
-                  <h1 className="font-semibold text-gray-900 dark:text-white text-lg">Tokebot</h1>
+                  <h1 className="font-semibold text-gray-900 dark:text-white text-lg">Tokebot (Mood Version)</h1>
                   <div className="flex items-center space-x-2">
                     <div className="h-2 w-2 bg-green-500 rounded-full"></div>
                     <span className="text-sm text-green-600 dark:text-green-400">Online</span>

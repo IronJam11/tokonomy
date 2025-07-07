@@ -69,7 +69,7 @@ const mainNavItems = [
     url: "/chatbot",
     items: [
       { title: "Chatbot Sonnet", url: "/chatbot" },
-      { title: "Yap coin", url: "/create-coin" },
+      { title: "Chatbot moodVersion", url: "/moodbot" },
     ],
   },
   {

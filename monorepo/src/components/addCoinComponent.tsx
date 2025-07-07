@@ -30,10 +30,18 @@ import { AIAnalysisComponent } from "./AIAnalysisComponent";
 const ZORA_API_KEY = process.env.NEXT_PUBLIC_ZORA_API_KEY;
 const CHAIN = Number(process.env.NEXT_PUBLIC_CHAIN_ID);
 
-
-export default function CreateCoinModal({ isOpen, onClose, initialData, trigger, coinPredictiveAnalysis, coinAnalysis}: CreateCoinModalProps) {
+export default function CreateCoinModal({ 
+  isOpen, 
+  onClose, 
+  initialData, 
+  trigger, 
+  coinPredictiveAnalysis, 
+  coinAnalysis 
+}: CreateCoinModalProps) {
   useEffect(() => {
-    setApiKey(ZORA_API_KEY);
+    if (ZORA_API_KEY) {
+      setApiKey(ZORA_API_KEY);
+    }
   }, []);
 
   const [name, setName] = useState("");
@@ -49,21 +57,27 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger,
   const [metadataUri, setMetadataUri] = useState<string>("");
   const [deployedCoinAddress, setDeployedCoinAddress] = useState<string>("");
   const [useDefaultImage, setUseDefaultImage] = useState(true);
+  
   const toastIds = useRef<{[key: string]: string}>({});
   const hasProcessedReceipt = useRef(false);
   const hasProcessedError = useRef(false);
+  const previousSimulationError = useRef<string | null>(null);
+
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const [CoinPredictionAnalysis, setCoinPredictionAnalysis] = useState<CoinPredictiveAnalysis | null>(null); 
   const [CoinAnalysis, setCoinAnalysis] = useState<CoinAnalysis | null>(null);
-
   const simulationConfig = useMemo(() => {
-    if (!contractCallParams || !address) return undefined;
+    if (!contractCallParams || !address || !isConnected) {
+      return { enabled: false };
+    }
+    
     return {
       ...contractCallParams,
       account: address,
+      enabled: true,
     };
-  }, [contractCallParams, address]);
+  }, [contractCallParams, address, isConnected]);
   
   const { data: simulation, error: simulationError } = useSimulateContract(simulationConfig);
 
@@ -80,10 +94,15 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger,
     data: receipt, 
     isLoading: isReceiptLoading, 
     isSuccess: isReceiptSuccess 
-  } = useWaitForTransactionReceipt({
-    hash: txHash,
-  });
+  } = useWaitForTransactionReceipt(
+    txHash
+      ? {
+          hash: txHash,
+        }
+      : { hash: undefined }
+  );
 
+  // Stable callback functions
   const addLink = useCallback(() => {
     setLinks(prev => [...prev, { platform: "", url: "" }]);
   }, []);
@@ -143,6 +162,7 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger,
         }
       ]
     };
+    
     const metadataBlob = new Blob([JSON.stringify(metadata, null, 2)], {
       type: 'application/json'
     });
@@ -164,6 +184,7 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger,
       toast.error("📝 Please fill in all required fields");
       return;
     }
+    
     const validLinks = links.filter(link => link.platform && link.url);
     if (validLinks.length !== links.length) {
       toast.error("🔗 Please complete all link entries or remove empty ones");
@@ -234,15 +255,40 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger,
   }, []);
 
   const handleClose = useCallback(() => {
-    // Clean up refs
     hasProcessedReceipt.current = false;
     hasProcessedError.current = false;
-    // Dismiss any existing toasts
+    previousSimulationError.current = null;
     Object.values(toastIds.current).forEach(id => toast.dismiss(id));
     toastIds.current = {};
     onClose();
   }, [onClose]);
 
+  // Optimized input handlers to prevent unnecessary re-renders
+  const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value);
+  }, []);
+
+  const handleSymbolChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSymbol(e.target.value.toUpperCase());
+  }, []);
+
+  const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setDescription(e.target.value);
+  }, []);
+
+  const handleAssetTypeChange = useCallback((value: string) => {
+    setAssetType(value);
+  }, []);
+
+  const handleCurrencyChange = useCallback((value: string) => {
+    setCurrency(Number(value) as DeployCurrency);
+  }, []);
+
+  const handleInitialPurchaseChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setInitialPurchaseAmount(e.target.value);
+  }, []);
+
+  // Effect to handle modal state changes
   useEffect(() => {
     if (isOpen) {
       if (initialData) {
@@ -263,17 +309,19 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger,
         setLinks([]);
         setUseDefaultImage(true);
       }
-      // Reset other states
       setContractCallParams(null);
       setMetadataUri("");
       setDeployedCoinAddress("");
       setIsPreparingCoin(false);
+      setCurrency(DeployCurrency.ZORA);
+      setInitialPurchaseAmount("");
       hasProcessedReceipt.current = false;
       hasProcessedError.current = false;
+      previousSimulationError.current = null;
     }
-  }, [isOpen, initialData]); // FIXED: Only depend on isOpen and initialData object, not its properties
+  }, [isOpen, initialData]);
 
-  // Handle transaction success - FIXED: prevent infinite loops
+  // Effect to handle successful receipt
   useEffect(() => {
     if (isReceiptSuccess && receipt && txHash && !hasProcessedReceipt.current) {
       hasProcessedReceipt.current = true;
@@ -282,36 +330,52 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger,
         if (coinDeployment?.coin) {
           setDeployedCoinAddress(coinDeployment.coin);
           toast.success(`🎉 Coin created successfully! Deployed at ${coinDeployment.coin}`);
-          // Don't close immediately, let user see the success message
-          setTimeout(() => onClose(), 2000);
+          setTimeout(() => handleClose(), 2000);
         }
       } catch (error) {
         console.error("Error extracting coin address:", error);
         toast.error("❌ Error creating coin");
       }
     }
-  }, [isReceiptSuccess, receipt, txHash, onClose]);
+  }, [isReceiptSuccess, receipt, txHash, handleClose]);
 
-  // Handle transaction errors - FIXED: prevent infinite loops
+  // Effect to handle transaction errors
   useEffect(() => {
     if (isWriteError && writeError && !hasProcessedError.current) {
       hasProcessedError.current = true;
-      toast.error(`❌ Transaction failed: ${writeError.message}`);
+      const errorMessage = writeError.message || "Unknown transaction error";
+      toast.error(`❌ Transaction failed: ${errorMessage}`);
     }
   }, [isWriteError, writeError]);
 
-  // Handle simulation errors - FIXED: prevent infinite loops
+  // Effect to handle simulation errors with deduplication
   useEffect(() => {
     if (simulationError && contractCallParams) {
-      console.error("Simulation error:", simulationError);
-      // Only show toast if we haven't shown it for this error
-      if (!toastIds.current.simulationError) {
-        toastIds.current.simulationError = toast.error(`❌ Simulation failed: ${simulationError.message}`);
+      const currentErrorMessage = simulationError.message || "Unknown simulation error";
+      
+      // Only show toast if this is a new error
+      if (previousSimulationError.current !== currentErrorMessage) {
+        console.error("Simulation error:", simulationError);
+        
+        // Clear previous simulation error toast
+        if (toastIds.current.simulationError) {
+          toast.dismiss(toastIds.current.simulationError);
+        }
+        
+        toastIds.current.simulationError = toast.error(`❌ Simulation failed: ${currentErrorMessage}`);
+        previousSimulationError.current = currentErrorMessage;
       }
+    } else if (!simulationError) {
+      // Clear error state when simulation succeeds
+      if (toastIds.current.simulationError) {
+        toast.dismiss(toastIds.current.simulationError);
+        delete toastIds.current.simulationError;
+      }
+      previousSimulationError.current = null;
     }
-  }, [simulationError, contractCallParams]);
+  }, [simulationError]);
 
-  // Handle pending states with toast notifications - FIXED: prevent duplicate toasts
+  // Effect to handle pending transaction state
   useEffect(() => {
     if (isWritePending && !toastIds.current.pending) {
       toastIds.current.pending = toast.loading("📝 Confirm transaction in wallet");
@@ -321,6 +385,7 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger,
     }
   }, [isWritePending]);
 
+  // Effect to handle receipt loading state
   useEffect(() => {
     if (isReceiptLoading && !toastIds.current.creating) {
       toastIds.current.creating = toast.loading("⏳ Creating your coin...");
@@ -330,296 +395,339 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger,
     }
   }, [isReceiptLoading]);
 
-  const isWrongNetwork = chainId && chainId !== baseSepolia.id;
+  // Memoized computed values
+  const isWrongNetwork = useMemo(() => 
+    chainId && chainId !== CHAIN, 
+    [chainId]
+  );
 
-  const ModalContent = () => (
-    <div className="max-h-[80vh] overflow-y-auto">
-      <div className="space-y-6">
-        {isWrongNetwork && (
-          <Alert className="border-orange-200 bg-orange-50">
-            <AlertCircle className="h-4 w-4 text-orange-600" />
-            <AlertDescription className="text-orange-800">
-              Please switch to Base network to create your coin. Current network may not be supported.
-            </AlertDescription>
-          </Alert>
-        )}
+  // Memoized Modal Content to prevent unnecessary re-renders
+  const ModalContent = useMemo(() => {
+    return (
+      <div className="max-h-[80vh] overflow-y-auto">
+        <div className="space-y-6">
+          {isWrongNetwork && (
+            <Alert className="border-orange-200 bg-orange-50">
+              <AlertCircle className="h-4 w-4 text-orange-600" />
+              <AlertDescription className="text-orange-800">
+                Please switch to Base network to create your coin. Current network may not be supported.
+              </AlertDescription>
+            </Alert>
+          )}
 
-        <AIAnalysisComponent 
-        coinPredictiveAnalysis={coinPredictiveAnalysis}
-        coinAnalysis={coinAnalysis}
-        />
+          <AIAnalysisComponent 
+            coinPredictiveAnalysis={coinPredictiveAnalysis}
+            coinAnalysis={coinAnalysis}
+          />
         
-        {/* Basic Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">
-              Asset Name <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="My Digital Asset"
-              required
-              className="focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="symbol">
-              Symbol <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="symbol"
-              type="text"
-              value={symbol}
-              onChange={(e) => setSymbol(e.target.value.toUpperCase())}
-              placeholder="MDA"
-              required
-              maxLength={10}
-              className="focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="assetType">
-            Asset Type <span className="text-red-500">*</span>
-          </Label>
-          <Select value={assetType} onValueChange={setAssetType}>
-            <SelectTrigger className="focus:ring-2 focus:ring-blue-500">
-              <SelectValue placeholder="Select asset type" />
-            </SelectTrigger>
-            <SelectContent>
-              {ASSET_TYPES.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="description">
-            Description <span className="text-red-500">*</span>
-          </Label>
-          <Textarea
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe your digital asset..."
-            required
-            rows={3}
-            className="focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Links Section */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label>Asset Links</Label>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={addLink}
-              className="flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Add Link
-            </Button>
-          </div>
-          
-          {links.map((link, index) => (
-            <div key={index} className="flex gap-2 items-end">
-              <div className="flex-1">
-                <Select 
-                  value={link.platform} 
-                  onValueChange={(value) => updateLink(index, 'platform', value)}
-                >
-                  <SelectTrigger className="focus:ring-2 focus:ring-blue-500">
-                    <SelectValue placeholder="Platform" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {LINK_PLATFORMS.map((platform) => (
-                      <SelectItem key={platform} value={platform}>
-                        {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex-2">
-                <Input
-                  type="url"
-                  value={link.url}
-                  onChange={(e) => updateLink(index, 'url', e.target.value)}
-                  placeholder="https://..."
-                  className="focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => removeLink(index)}
-                className="text-red-500 hover:text-red-700"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-          
-          {links.length === 0 && (
-            <p className="text-sm text-muted-foreground">
-              Add links to your asset (YouTube, Instagram, GitHub, etc.)
-            </p>
-          )}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="image">
-            Asset Image {useDefaultImage && <span className="text-sm text-muted-foreground">(Using default image)</span>}
-          </Label>
-          <Input
-            id="image"
-            type="file"
-            onChange={handleImageChange}
-            accept="image/*"
-            className="focus:ring-2 focus:ring-blue-500"
-          />
-          {image && (
-            <div className="mt-3 flex items-center space-x-3">
-              <img 
-                src={URL.createObjectURL(image)} 
-                alt="Preview" 
-                className="h-20 w-20 object-cover rounded-lg border-2 border-blue-200"
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">
+                Asset Name <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="name"
+                type="text"
+                value={name}
+                onChange={handleNameChange}
+                placeholder="My Digital Asset"
+                required
+                className="focus:ring-2 focus:ring-blue-500"
               />
-              <div className="text-sm text-muted-foreground">
-                <p className="font-medium">{image.name}</p>
-                <p>{(image.size / 1024 / 1024).toFixed(2)} MB</p>
-              </div>
             </div>
-          )}
-          {useDefaultImage && (
-            <div className="mt-3 flex items-center space-x-3">
-              <img 
-                src={DEFAULT_IMAGE_DATA_URL} 
-                alt="Default Preview" 
-                className="h-20 w-20 object-cover rounded-lg border-2 border-gray-200"
+
+            <div className="space-y-2">
+              <Label htmlFor="symbol">
+                Symbol <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="symbol"
+                type="text"
+                value={symbol}
+                onChange={handleSymbolChange}
+                placeholder="MDA"
+                required
+                maxLength={10}
+                className="focus:ring-2 focus:ring-blue-500"
               />
-              <div className="text-sm text-muted-foreground">
-                <p className="font-medium">Default placeholder image</p>
-                <p>Will be used if no image is uploaded</p>
-              </div>
             </div>
-          )}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          </div>
+
           <div className="space-y-2">
-            <Label htmlFor="currency">Trading Currency</Label>
-            <Select value={currency.toString()} onValueChange={(value) => setCurrency(Number(value) as DeployCurrency)}>
+            <Label htmlFor="assetType">
+              Asset Type <span className="text-red-500">*</span>
+            </Label>
+            <Select value={assetType} onValueChange={handleAssetTypeChange}>
               <SelectTrigger className="focus:ring-2 focus:ring-blue-500">
-                <SelectValue placeholder="Select currency" />
+                <SelectValue placeholder="Select asset type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={DeployCurrency.ZORA.toString()}>
-                  <div className="flex items-center space-x-2">
-                    <span>ZORA</span>
-                    <span className="text-xs text-muted-foreground">(Recommended)</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value={DeployCurrency.ETH.toString()}>ETH</SelectItem>
+                {ASSET_TYPES.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="initialPurchase">Initial Purchase (ETH)</Label>
-            <Input
-              id="initialPurchase"
-              type="number"
-              value={initialPurchaseAmount}
-              onChange={(e) => setInitialPurchaseAmount(e.target.value)}
-              placeholder="0.01"
-              min="0"
-              step="0.001"
+            <Label htmlFor="description">
+              Description <span className="text-red-500">*</span>
+            </Label>
+            <Textarea
+              id="description"
+              value={description}
+              onChange={handleDescriptionChange}
+              placeholder="Describe your digital asset..."
+              required
+              rows={3}
               className="focus:ring-2 focus:ring-blue-500"
             />
-            <p className="text-xs text-muted-foreground">
-              Optional: Seeds initial liquidity
-            </p>
           </div>
-        </div>
-        <div className="flex space-x-4">
-          <Button
-            onClick={handlePrepareCoin}
-            disabled={isPreparingCoin || !isConnected || !!isWrongNetwork}
-            className="flex-1"
-          >
-            {isPreparingCoin ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Preparing...
-              </>
-            ) : (
-              <>
-                <Upload className="mr-2 h-4 w-4" />
-                Prepare Coin
-              </>
-            )}
-          </Button>
 
-          {contractCallParams && simulation && (
+          {/* Links Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label>Asset Links</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addLink}
+                className="flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Add Link
+              </Button>
+            </div>
+            
+            {links.map((link, index) => (
+              <div key={index} className="flex gap-2 items-end">
+                <div className="flex-1">
+                  <Select 
+                    value={link.platform} 
+                    onValueChange={(value) => updateLink(index, 'platform', value)}
+                  >
+                    <SelectTrigger className="focus:ring-2 focus:ring-blue-500">
+                      <SelectValue placeholder="Platform" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {LINK_PLATFORMS.map((platform) => (
+                        <SelectItem key={platform} value={platform}>
+                          {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex-2">
+                  <Input
+                    type="url"
+                    value={link.url}
+                    onChange={(e) => updateLink(index, 'url', e.target.value)}
+                    placeholder="https://..."
+                    className="focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => removeLink(index)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            
+            {links.length === 0 && (
+              <p className="text-sm text-muted-foreground">
+                Add links to your asset (YouTube, Instagram, GitHub, etc.)
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="image">
+              Asset Image {useDefaultImage && <span className="text-sm text-muted-foreground">(Using default image)</span>}
+            </Label>
+            <Input
+              id="image"
+              type="file"
+              onChange={handleImageChange}
+              accept="image/*"
+              className="focus:ring-2 focus:ring-blue-500"
+            />
+            {image && (
+              <div className="mt-3 flex items-center space-x-3">
+                <img 
+                  src={URL.createObjectURL(image)} 
+                  alt="Preview" 
+                  className="h-20 w-20 object-cover rounded-lg border-2 border-blue-200"
+                />
+                <div className="text-sm text-muted-foreground">
+                  <p className="font-medium">{image.name}</p>
+                  <p>{(image.size / 1024 / 1024).toFixed(2)} MB</p>
+                </div>
+              </div>
+            )}
+            {useDefaultImage && (
+              <div className="mt-3 flex items-center space-x-3">
+                <img 
+                  src={DEFAULT_IMAGE_DATA_URL} 
+                  alt="Default Preview" 
+                  className="h-20 w-20 object-cover rounded-lg border-2 border-gray-200"
+                />
+                <div className="text-sm text-muted-foreground">
+                  <p className="font-medium">Default placeholder image</p>
+                  <p>Will be used if no image is uploaded</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="currency">Trading Currency</Label>
+              <Select value={currency.toString()} onValueChange={handleCurrencyChange}>
+                <SelectTrigger className="focus:ring-2 focus:ring-blue-500">
+                  <SelectValue placeholder="Select currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={DeployCurrency.ZORA.toString()}>
+                    <div className="flex items-center space-x-2">
+                      <span>ZORA</span>
+                      <span className="text-xs text-muted-foreground">(Recommended)</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value={DeployCurrency.ETH.toString()}>ETH</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="initialPurchase">Initial Purchase (ETH)</Label>
+              <Input
+                id="initialPurchase"
+                type="number"
+                value={initialPurchaseAmount}
+                onChange={handleInitialPurchaseChange}
+                placeholder="0.01"
+                min="0"
+                step="0.001"
+                className="focus:ring-2 focus:ring-blue-500"
+              />
+              <p className="text-xs text-muted-foreground">
+                Optional: Seeds initial liquidity
+              </p>
+            </div>
+          </div>
+
+          <div className="flex space-x-4">
             <Button
-              type="button"
-              onClick={handleCreateCoin}
-              disabled={isWritePending || isReceiptLoading || !simulation.request}
+              onClick={handlePrepareCoin}
+              disabled={isPreparingCoin || !isConnected || !!isWrongNetwork}
               className="flex-1"
             >
-              {isWritePending || isReceiptLoading ? (
+              {isPreparingCoin ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isWritePending ? "Confirming..." : "Creating..."}
+                  Preparing...
                 </>
               ) : (
                 <>
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Create Coin
+                  <Upload className="mr-2 h-4 w-4" />
+                  Prepare Coin
                 </>
               )}
             </Button>
+
+            {contractCallParams && simulation && (
+              <Button
+                type="button"
+                onClick={handleCreateCoin}
+                disabled={isWritePending || isReceiptLoading || !simulation.request}
+                className="flex-1"
+              >
+                {isWritePending || isReceiptLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {isWritePending ? "Confirming..." : "Creating..."}
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Create Coin
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
+
+          {simulationError && contractCallParams && (
+            <Alert className="border-red-200 bg-red-50">
+              <XCircle className="h-4 w-4 text-red-600" />
+              <AlertDescription className="text-red-800">
+                Transaction simulation failed. Please check your parameters.
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {metadataUri && (
+            <Alert className="border-green-200 bg-green-50">
+              <CheckCircle className="h-4 w-4 text-green-600" />
+              <AlertDescription className="text-green-800">
+                Metadata uploaded successfully! 
+                <a 
+                  href={metadataUri} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="ml-2 underline hover:text-green-900"
+                >
+                  View metadata <ExternalLink className="inline h-3 w-3" />
+                </a>
+              </AlertDescription>
+            </Alert>
           )}
         </div>
-        {simulationError && contractCallParams && (
-          <Alert className="border-red-200 bg-red-50">
-            <XCircle className="h-4 w-4 text-red-600" />
-            <AlertDescription className="text-red-800">
-              Transaction simulation failed. Please check your parameters.
-            </AlertDescription>
-          </Alert>
-        )}
-        
-        {metadataUri && (
-          <Alert className="border-green-200 bg-green-50">
-            <CheckCircle className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-800">
-              Metadata uploaded successfully! 
-              <a 
-                href={metadataUri} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="ml-2 underline hover:text-green-900"
-              >
-                View metadata <ExternalLink className="inline h-3 w-3" />
-              </a>
-            </AlertDescription>
-          </Alert>
-        )}
       </div>
-    </div>
-  );
+    );
+  }, [
+    isWrongNetwork,
+    coinPredictiveAnalysis,
+    coinAnalysis,
+    name,
+    symbol,
+    assetType,
+    description,
+    links,
+    image,
+    useDefaultImage,
+    currency,
+    initialPurchaseAmount,
+    isPreparingCoin,
+    isConnected,
+    contractCallParams,
+    simulation,
+    isWritePending,
+    isReceiptLoading,
+    simulationError,
+    metadataUri,
+    handleNameChange,
+    handleSymbolChange,
+    handleAssetTypeChange,
+    handleDescriptionChange,
+    addLink,
+    updateLink,
+    removeLink,
+    handleImageChange,
+    handleCurrencyChange,
+    handleInitialPurchaseChange,
+    handlePrepareCoin,
+    handleCreateCoin,
+  ]);
 
   if (trigger) {
     return (
@@ -634,7 +742,7 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger,
             </DialogTitle>
           </DialogHeader>
           {isConnected ? (
-            <ModalContent />
+            ModalContent
           ) : (
             <div className="text-center py-8">
               <p className="text-muted-foreground mb-4">Please connect your wallet to create a coin</p>
@@ -657,7 +765,7 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger,
           </DialogTitle>
         </DialogHeader>
         {isConnected ? (
-          <ModalContent />
+          ModalContent
         ) : (
           <div className="text-center py-8">
             <p className="text-muted-foreground mb-4">Please connect your wallet to create a coin</p>
