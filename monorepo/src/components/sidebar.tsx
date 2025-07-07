@@ -49,9 +49,8 @@ const mainNavItems = [
     icon: Users,
     url: "/users",
     items: [
-      { title: "Your Profile", url: "/profile" },
-      { title: "User Profile Search", url: "/users/new" },
-      { title: "User Roles", url: "/users/roles" },
+      { title: "Profile (Me)", url: "/profile" },
+      { title: "User Profile Search", url: "/users/new" }
     ],
   },
   {
