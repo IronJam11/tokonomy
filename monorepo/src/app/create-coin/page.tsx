@@ -5,7 +5,6 @@ import { useAccount, useChainId, useWriteContract, useSimulateContract, useWaitF
 import { setApiKey } from "@zoralabs/coins-sdk";
 import { parseEther } from "viem";
 import toast from "react-hot-toast";
-import { base, baseSepolia } from "viem/chains";
 import { 
   DeployCurrency, 
   InitialPurchaseCurrency, 
@@ -26,7 +25,9 @@ import { uploadToIPFS } from "@/utils/pinata/upload";
 import { ASSET_TYPES } from "@/utils/constants/add-coin/assetTypes";
 import { LINK_PLATFORMS } from "@/utils/constants/add-coin/linkPlatforms";
 
-const ZORA_API_KEY = process.env.NEXT_PUBLIC_ZORA_API_KEY || "zora_api_d66c8d3743429a5ea3f9bdc60d905a6b130a670b34d4f33519d33baf8a76c5b8";
+const ZORA_API_KEY = process.env.NEXT_PUBLIC_ZORA_API_KEY;
+const CHAIN = Number(process.env.NEXT_PUBLIC_CHAIN_ID);
+
 export default function CreateCoinPage() {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
@@ -214,7 +215,7 @@ export default function CreateCoinPage() {
         symbol,
         uri: metadataUrl as import("@zoralabs/coins-sdk").ValidMetadataURI,
         payoutRecipient: address as `0x${string}`,
-        chainId: chainId || base.id,
+        chainId: chainId || CHAIN,
         currency,
         ...(initialPurchaseAmount && {
           initialPurchase: {
@@ -260,7 +261,7 @@ export default function CreateCoinPage() {
     }
   };
 
-  const isWrongNetwork = chainId && chainId !== baseSepolia.id;
+  const isWrongNetwork = chainId && chainId !== CHAIN;
 
   return (
     <div className="">

@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, MessageCircle, Users, TrendingUp, Calendar, ArrowLeft, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
+const CHAIN = Number(process.env.NEXT_PUBLIC_CHAIN_ID);
 
 interface CoinData {
   name: string;
@@ -71,7 +72,7 @@ export default function CoinDetailsPage() {
     try {
       const response = await getCoin({
         address: coinAddress as Address,
-        chain: baseSepolia.id,
+        chain: CHAIN,
       });
 
       const coinData = response.data?.zora20Token;

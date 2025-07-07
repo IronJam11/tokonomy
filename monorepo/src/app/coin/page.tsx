@@ -13,7 +13,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Plus, X, MessageCircle, Users, TrendingUp, Calendar, User } from 'lucide-react';
 
 
-// Types based on the SDK documentation
+const CHAIN = Number(process.env.NEXT_PUBLIC_CHAIN_ID);
 interface CoinData {
   name: string;
   symbol: string;
@@ -67,7 +67,7 @@ export default function ZoraCoinsPage() {
     try {
       const response = await getCoin({
         address: coinAddress as Address,
-        chain: baseSepolia.id,
+        chain: CHAIN,
       });
 
       const coin = response.data?.zora20Token;

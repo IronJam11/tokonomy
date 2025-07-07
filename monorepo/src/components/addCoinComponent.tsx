@@ -25,9 +25,10 @@ import { ASSET_TYPES } from "@/utils/constants/add-coin/assetTypes";
 import { LINK_PLATFORMS } from "@/utils/constants/add-coin/linkPlatforms";
 import { DEFAULT_IMAGE_DATA_URL } from "@/utils/constants/addCoinConstants";
 import { CreateCoinModalProps, CoinPredictiveAnalysis, CoinAnalysis } from "@/utils/interfaces";
-import AIAnalysisComponent from "./AIAnalysisComponent";
+import { AIAnalysisComponent } from "./AIAnalysisComponent";
 
 const ZORA_API_KEY = process.env.NEXT_PUBLIC_ZORA_API_KEY;
+const CHAIN = Number(process.env.NEXT_PUBLIC_CHAIN_ID);
 
 
 export default function CreateCoinModal({ isOpen, onClose, initialData, trigger, coinPredictiveAnalysis, coinAnalysis}: CreateCoinModalProps) {
@@ -182,7 +183,7 @@ export default function CreateCoinModal({ isOpen, onClose, initialData, trigger,
         symbol,
         uri: metadataUrl as import("@zoralabs/coins-sdk").ValidMetadataURI,
         payoutRecipient: address as `0x${string}`,
-        chainId: chainId || base.id,
+        chainId: chainId || CHAIN,
         currency,
         ...(initialPurchaseAmount && {
           initialPurchase: {

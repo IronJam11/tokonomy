@@ -33,6 +33,8 @@ import {
   HelpCircle,
 } from "lucide-react"
 
+import { useAccount, useChainId } from "wagmi";
+
 import { Button } from "@/components/ui/button"
 
 const mainNavItems = [
@@ -100,18 +102,21 @@ const quickActions = [
 
 export function AppSidebar() {
   const { open, toggleSidebar } = useSidebar()
+  const {address} = useAccount();
+  const chainId = useChainId();
+
 
   return (
     <div className="relative">
       <Sidebar>
-        <SidebarHeader className="border-b px-6 py-4">
+        {/* <SidebarHeader className="border-b px-6 py-4">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <span className="text-sm font-bold"><img src="/tokonomy-logo.png" alt="Tokonomy Logo" /></span>
             </div>
             <span className="text-lg font-semibold">Tokonomy</span>
           </div>
-        </SidebarHeader>
+        </SidebarHeader> */}
 
         <SidebarContent className="px-4 py-4">
           {/* Main Navigation */}
@@ -179,19 +184,18 @@ export function AppSidebar() {
 
         <SidebarFooter className="border-t p-4">
           <SidebarMenu>
-            {/* User Profile */}
             <SidebarMenuItem>
               <SidebarMenuButton asChild className="h-auto p-3">
                 <div className="flex items-center gap-3">
                   <div className="flex-1 text-left">
-                    <p className="text-sm font-medium">John Doe</p>
-                    <p className="text-xs text-muted-foreground">john@example.com</p>
+                    <p className="text-sm font-medium">{address ? address : "Connect Wallet"}</p>
+                    <p className="text-xs text-muted-foreground">{chainId ? `Chain ID: ${chainId}` : ""}</p>
+                    <p className="text-xs text-muted-foreground"> (Advisable chain: Base mainnet)</p>
                   </div>
                 </div>
               </SidebarMenuButton>
             </SidebarMenuItem>
 
-            {/* Settings and Logout */}
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
                 <a href="/settings" className="flex items-center gap-3">
@@ -213,7 +217,6 @@ export function AppSidebar() {
         </SidebarFooter>
       </Sidebar>
       
-      {/* Toggle Arrow Button */}
       <Button
         variant="outline"
         size="sm"
