@@ -60,6 +60,7 @@ const mainNavItems = [
     items: [
       { title: "Explore coins", url: "/coin" },
       { title: "Create coin", url: "/create-coin" },
+      { title: "Trade coin", url: "/trade-coin" },
     ],
   },
   {

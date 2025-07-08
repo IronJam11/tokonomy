@@ -33,6 +33,11 @@ export function Navbar() {
       description: "Tokenise digital content"
     },
     {
+      href: "/trade-coin",
+      title: "Trade a coin",
+      description: "Trade coins"
+    },
+    {
       href: "/chatbot",
       title: "Tokebot Sonnet",
       description: "Talk to ai agent"

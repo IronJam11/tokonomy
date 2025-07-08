@@ -242,7 +242,7 @@ export default function CoinDetailsPage() {
         <div className="flex-1">
           <h1 className="text-4xl font-bold">{coin?.name || 'Coin Details'}</h1>
           <p className="text-muted-foreground font-mono text-sm mt-1">
-            {formatAddress(coinAddress)}
+            {(coinAddress)}
           </p>
         </div>
         <Button onClick={fetchCoinData} disabled={loading} variant="outline" size="sm">
