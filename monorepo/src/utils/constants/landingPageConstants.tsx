@@ -19,7 +19,7 @@ export const features = [
   {
     icon: <Bot className="w-6 h-6" />,
     title: "AI-Powered Coin Creation",
-    description: "Three specialized AI chatbots - Tokebit Sonnet, Tokebot Mood, and Tokebot Prompt - each designed for different coin creation workflows."
+    description: "Three specialized AI chatbots - Tokebot Sonnet, Tokebot Mood, and Tokebot Prompt - each designed for different coin creation workflows."
   },
   {
     icon: <Coins className="w-6 h-6" />,
@@ -57,7 +57,7 @@ export const stats = [
 
 export const testimonials = [
   {
-    content: "Tokebit Sonnet helped me create my first coin in minutes. The AI analysis was spot-on and my coin performed exactly as predicted!",
+    content: "Tokebot Sonnet helped me create my first coin in minutes. The AI analysis was spot-on and my coin performed exactly as predicted!",
     name: "Alex Rivera",
     role: "Crypto Creator, DeFi Ventures",
     avatar: "AR",
@@ -89,7 +89,7 @@ export const partners = [
 
 export const aiChatbots = [
   {
-    name: "Tokebit Sonnet",
+    name: "Tokebot Sonnet",
     type: "Basic Agent",
     icon: <Bot className="w-8 h-8" />,
     description: "Describe your coin parameters and let Sonnet create, search, and analyze coins with intelligent conversation.",
