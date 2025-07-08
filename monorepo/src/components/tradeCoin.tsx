@@ -31,7 +31,6 @@ export default function CoinTradeComponent({
   const publicClient = usePublicClient();
   const { address: account } = useAccount();
 
-  // Toast notifications for errors and success
   useEffect(() => {
     if (error) {
       toast.error(error);
@@ -44,7 +43,6 @@ export default function CoinTradeComponent({
     }
   }, [txHash]);
 
-  // Helper to parse amount to BigInt
   const parseToBigInt = (value: string, decimals: number): bigint => {
     try {
       return parseUnits(value, decimals);
