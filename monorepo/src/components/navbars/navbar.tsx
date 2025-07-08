@@ -23,9 +23,7 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navigationItems = [
-    { href: "/", label: "Home" },
     { href: "/docs", label: "Documentation" },
-    { href: "/chatbot", label: "Chatbot" },
   ];
 
   const serviceItems = [
@@ -36,15 +34,34 @@ export function Navbar() {
     },
     {
       href: "/chatbot",
-      title: "Chatbot",
+      title: "Tokebot Sonnet",
       description: "Talk to ai agent"
-    }
+    },
+    {
+      href: "/moodbot",
+      title: "Tokebot Mood",
+      description: "Tokenise your thoughts"
+    },
+    {
+      href: "/profile",
+      title: "Profile",
+      description: "View your profile"
+    },
+    {
+      href: "/coin",
+      title: "Coins",
+      description: "Search for your favorite coins"
+    },
+     {
+      href: "/coin-explorer",
+      title: "Coin Explorer",
+      description: "Discover and trade new coins"
+    },
   ];
 
   return (
     <nav className="sticky top-0 h-18 w-full border-b bg-background z-50">
       <div className="flex h-16 items-center px-4">
-        {/* Logo and Brand */}
         <div className="flex items-center space-x-3">
           <Link href="/" className="flex items-center space-x-2 md:space-x-3">
             <Image 
@@ -59,8 +76,6 @@ export function Navbar() {
             </span>
           </Link>
         </div>
-
-        {/* Desktop Navigation */}
         <div className="hidden lg:flex flex-1 items-center justify-end gap-4">
           <NavigationMenu>
             <NavigationMenuList>

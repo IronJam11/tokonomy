@@ -34,7 +34,7 @@ import {
   BatteryPlusIcon,
 } from "lucide-react"
 
-import { useAccount, useChainId } from "wagmi";
+import { useAccount, useChainId, useDisconnect } from "wagmi";
 
 import { Button } from "@/components/ui/button"
 
@@ -100,9 +100,13 @@ const quickActions = [
 
 export function AppSidebar() {
   const { open, toggleSidebar } = useSidebar()
-  const {address} = useAccount();
+  const { address, isConnected } = useAccount();
   const chainId = useChainId();
+  const { disconnect } = useDisconnect();
 
+  const handleDisconnect = () => {
+    disconnect();
+  };
 
   return (
     <div className="relative">
@@ -186,8 +190,12 @@ export function AppSidebar() {
               <SidebarMenuButton asChild className="h-auto p-3">
                 <div className="flex items-center gap-3">
                   <div className="flex-1 text-left">
-                    <p className="text-sm font-medium">{address ? address : "Connect Wallet"}</p>
-                    <p className="text-xs text-muted-foreground">{chainId ? `Chain ID: ${chainId}` : ""}</p>
+                    <p className="text-sm font-medium">
+                      {isConnected && address ? address : "Connect Wallet"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {chainId ? `Chain ID: ${chainId}` : ""}
+                    </p>
                     <p className="text-xs text-muted-foreground"> (Advisable chain: Base mainnet)</p>
                   </div>
                 </div>
@@ -203,14 +211,19 @@ export function AppSidebar() {
               </SidebarMenuButton>
             </SidebarMenuItem>
 
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <button className="flex w-full items-center gap-3 text-destructive">
-                  <LogOut className="h-4 w-4" />
-                  <span>Logout</span>
-                </button>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+            {isConnected && (
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <button 
+                    onClick={handleDisconnect}
+                    className="flex w-full items-center gap-3 text-destructive"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Disconnect Wallet</span>
+                  </button>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
           </SidebarMenu>
         </SidebarFooter>
       </Sidebar>
