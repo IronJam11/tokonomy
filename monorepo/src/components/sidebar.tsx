@@ -72,30 +72,18 @@ const mainNavItems = [
       { title: "Prompt", url: "/prompt-bot" },
     ],
   },
-  {
-    title: "Messages",
-    icon: Mail,
-    url: "/messages",
-    badge: "12",
-  },
 ]
 
 const quickActions = [
   {
-    title: "Search",
+    title: "Docs",
     icon: Search,
-    url: "/search",
+    url: "/docs",
   },
   {
-    title: "Notifications",
-    icon: Bell,
-    url: "/notifications",
-    badge: "3",
-  },
-  {
-    title: "Help Center",
+    title: "About us",
     icon: HelpCircle,
-    url: "/help",
+    url: "/",
   },
 ]
 
@@ -112,17 +100,7 @@ export function AppSidebar() {
   return (
     <div className="relative">
       <Sidebar>
-        {/* <SidebarHeader className="border-b px-6 py-4">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <span className="text-sm font-bold"><img src="/tokonomy-logo.png" alt="Tokonomy Logo" /></span>
-            </div>
-            <span className="text-lg font-semibold">Tokonomy</span>
-          </div>
-        </SidebarHeader> */}
-
         <SidebarContent className="px-4 py-4">
-          {/* Main Navigation */}
           <SidebarGroup>
             <SidebarGroupLabel>Navigation</SidebarGroupLabel>
             <SidebarGroupContent>
@@ -133,11 +111,6 @@ export function AppSidebar() {
                       <a href={item.url} className="flex items-center gap-3">
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
-                        {item.badge && (
-                          <span className="ml-auto rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
-                            {item.badge}
-                          </span>
-                        )}
                         {item.items && <ChevronRight className="ml-auto h-4 w-4" />}
                       </a>
                     </SidebarMenuButton>
@@ -160,7 +133,6 @@ export function AppSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
 
-          {/* Quick Actions */}
           <SidebarGroup>
             <SidebarGroupLabel>Quick Actions</SidebarGroupLabel>
             <SidebarGroupContent>
@@ -171,11 +143,6 @@ export function AppSidebar() {
                       <a href={item.url} className="flex items-center gap-3">
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
-                        {item.badge && (
-                          <span className="ml-auto rounded-full bg-destructive px-2 py-0.5 text-xs text-destructive-foreground">
-                            {item.badge}
-                          </span>
-                        )}
                       </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
