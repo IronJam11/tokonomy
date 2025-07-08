@@ -59,6 +59,10 @@ export default function CoinDetailsPage() {
   const [commentsError, setCommentsError] = useState<string | null>(null);
 
   const isValidAddress = coinAddress && isAddress(coinAddress);
+
+  const formatAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  }
   const fetchCoinData = async () => {
     if (!isValidAddress) {
       setError('Invalid coin address format');
@@ -140,7 +144,6 @@ export default function CoinDetailsPage() {
     }
   };
 
-  // Fetch all comments with pagination
   const fetchAllComments = async () => {
     if (!isValidAddress) return;
 
@@ -239,7 +242,7 @@ export default function CoinDetailsPage() {
         <div className="flex-1">
           <h1 className="text-4xl font-bold">{coin?.name || 'Coin Details'}</h1>
           <p className="text-muted-foreground font-mono text-sm mt-1">
-            {coinAddress}
+            {formatAddress(coinAddress)}
           </p>
         </div>
         <Button onClick={fetchCoinData} disabled={loading} variant="outline" size="sm">
@@ -318,7 +321,7 @@ export default function CoinDetailsPage() {
               <div className="space-y-2">
                 <p className="text-sm font-medium text-muted-foreground">Creator</p>
                 <p className="text-sm font-mono bg-muted p-2 rounded">
-                  {coin.creatorAddress}
+                  {formatAddress(coin.creatorAddress)}
                 </p>
               </div>
               <div className="space-y-2">

@@ -31,7 +31,7 @@ interface ProfileData {
 
 interface CoinBalance {
   id?: string;
-  token?: {
+  coin?: {
     id?: string;
     name?: string;
     symbol?: string;
@@ -66,6 +66,9 @@ export default function ProfilePage({ userAddress }: { userAddress: string }) {
   const [error, setError] = useState<string | null>(null);
   const [balancesError, setBalancesError] = useState<string | null>(null);
   const [totalValue, setTotalValue] = useState<number>(0);
+
+  console.log("profie",profile);
+
 
 
   const isValidIdentifier = userAddress && (isAddress(userAddress) || userAddress.length > 0);
@@ -180,8 +183,6 @@ export default function ProfilePage({ userAddress }: { userAddress: string }) {
       } while (true);
 
       setBalances(allBalances);
-      
-      // Calculate total USD value
       const total = allBalances.reduce((sum: number, balance: any) => {
         const value = parseFloat(balance.valueUsd || '0');
         return sum + value;
@@ -193,13 +194,10 @@ export default function ProfilePage({ userAddress }: { userAddress: string }) {
       setBalancesLoading(false);
     }
   };
-
-  // Load profile data on component mount
   useEffect(() => {
     fetchProfile();
   }, [userAddress]);
 
-  // Auto-load balances when profile data is loaded
   useEffect(() => {
     if (profile) {
       fetchBalances();
@@ -363,7 +361,7 @@ export default function ProfilePage({ userAddress }: { userAddress: string }) {
               <div className="space-y-2">
                 <p className="text-sm font-medium text-muted-foreground">Unique Tokens</p>
                 <p className="text-2xl font-bold">
-                  {new Set(balances.map(b => b.token?.symbol)).size}
+                  {new Set(balances.map(b => b.coin?.symbol)).size}
                 </p>
               </div>
             </div>
@@ -425,26 +423,26 @@ export default function ProfilePage({ userAddress }: { userAddress: string }) {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-                                {balance.token?.media?.previewImage ? (
+                                {balance.coin?.media?.previewImage ? (
                                   <img 
-                                    src={balance.token.media.previewImage} 
-                                    alt={balance.token.name}
+                                    src={balance.coin.media.previewImage} 
+                                    alt={balance.coin.name}
                                     className="w-full h-full object-cover"
                                   />
                                 ) : (
                                   <span className="text-white text-xs font-medium">
-                                    {balance.token?.symbol?.slice(0, 2)}
+                                    {balance.coin?.symbol?.slice(0, 2)}
                                   </span>
                                 )}
                               </div>
                               <div>
-                                <p className="font-medium text-sm">{balance.token?.name}</p>
+                                <p className="font-medium text-sm">{balance.coin?.name}</p>
                                 <Badge variant="secondary" className="text-xs">
-                                  {balance.token?.symbol}
+                                  {balance.coin?.symbol}
                                 </Badge>
                               </div>
                             </div>
-                            <Link href={`/${balance.token?.address}`}>
+                            <Link href={`/coin/${balance.coin?.address}`}>
                               <Button variant="ghost" size="sm">
                                 <ExternalLink className="w-4 h-4" />
                               </Button>
@@ -469,7 +467,7 @@ export default function ProfilePage({ userAddress }: { userAddress: string }) {
                             <div className="flex justify-between">
                               <span className="text-sm text-muted-foreground">Market Cap</span>
                               <span className="text-sm font-medium">
-                                {balance.token?.marketCap || 'N/A'}
+                                {balance.coin?.marketCap || 'N/A'}
                               </span>
                             </div>
                           </div>
