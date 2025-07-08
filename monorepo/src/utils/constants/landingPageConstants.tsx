@@ -1,148 +1,142 @@
-import { 
-  ArrowRight, 
-  Zap, 
-  Shield, 
-  Sparkles, 
-  Users, 
-  TrendingUp, 
-  CheckCircle,
-  Star,
-  Play,
-  Award,
-  Globe,
-  Clock,
-  MessageCircle,
-  Mail,
-  Phone,
-  Building2,
+import {
+  ArrowRight,
+  Zap,
+  Shield,
+  Sparkles,
+  Users,
+  TrendingUp,
   Rocket,
-  Target,
   BarChart3,
-  Layers,
-  Lock,
-  Smartphone
+  Bot,
+  Coins,
+  Search,
+  Brain,
+  Lightbulb,
+  Activity
 } from "lucide-react";
 
-// Mock data for the landing page
 export const features = [
   {
-    icon: <Zap className="w-6 h-6" />,
-    title: "Lightning Fast",
-    description: "Process workflows 10x faster with our optimized automation engine powered by advanced AI algorithms."
+    icon: <Bot className="w-6 h-6" />,
+    title: "AI-Powered Coin Creation",
+    description: "Three specialized AI chatbots - Tokebit Sonnet, Tokebot Mood, and Tokebot Prompt - each designed for different coin creation workflows."
   },
   {
-    icon: <Shield className="w-6 h-6" />,
-    title: "Enterprise Security",
-    description: "Bank-level security with end-to-end encryption, SOC 2 compliance, and advanced threat protection."
+    icon: <Coins className="w-6 h-6" />,
+    title: "Zora Protocol Integration",
+    description: "Seamlessly deploy coins on the Zora protocol with automated smart contract generation and instant minting capabilities."
   },
   {
-    icon: <Users className="w-6 h-6" />,
-    title: "Team Collaboration",
-    description: "Seamless real-time collaboration with advanced permission controls and activity tracking."
+    icon: <Brain className="w-6 h-6" />,
+    title: "Predictive Success Analysis",
+    description: "AI-powered analysis that predicts coin success potential, providing strengths, weaknesses, and viral opportunity insights."
+  },
+  {
+    icon: <Search className="w-6 h-6" />,
+    title: "Advanced Search & Discovery",
+    description: "Explore trending coins, search profiles, and discover emerging opportunities through our intelligent coin explorer."
+  },
+  {
+    icon: <Lightbulb className="w-6 h-6" />,
+    title: "Mood-Based Creation",
+    description: "Rant, yap, or express yourself - Tokebot Mood transforms your emotions into perfectly crafted coin parameters."
   },
   {
     icon: <TrendingUp className="w-6 h-6" />,
-    title: "Advanced Analytics",
-    description: "Deep insights and actionable analytics to optimize your workflows and boost productivity."
-  },
-  {
-    icon: <Layers className="w-6 h-6" />,
-    title: "Smart Integrations",
-    description: "Connect with 500+ tools and platforms through our intelligent integration ecosystem."
-  },
-  {
-    icon: <Smartphone className="w-6 h-6" />,
-    title: "Mobile Ready",
-    description: "Full-featured mobile experience with offline capabilities and push notifications."
+    title: "Viral Optimization",
+    description: "Tokebot Prompt researches trends and optimizes your coin concept for maximum viral potential and market impact."
   }
 ];
 
-
 export const stats = [
-  { icon: <Users className="w-6 h-6 text-gray-600 dark:text-gray-400" />, value: "50K+", label: "Active Users" },
-  { icon: <Globe className="w-6 h-6 text-gray-600 dark:text-gray-400" />, value: "120+", label: "Countries" },
-  { icon: <Award className="w-6 h-6 text-gray-600 dark:text-gray-400" />, value: "99.9%", label: "Uptime" },
-  { icon: <TrendingUp className="w-6 h-6 text-gray-600 dark:text-gray-400" />, value: "4.8", label: "Rating" }
+  { icon: <Coins className="w-6 h-6 text-gray-600 dark:text-gray-400" />, value: "25K+", label: "Coins Created" },
+  { icon: <Users className="w-6 h-6 text-gray-600 dark:text-gray-400" />, value: "12K+", label: "Active Creators" },
+  { icon: <Bot className="w-6 h-6 text-gray-600 dark:text-gray-400" />, value: "100K+", label: "AI Interactions" },
+  { icon: <Activity className="w-6 h-6 text-gray-600 dark:text-gray-400" />, value: "89%", label: "Success Rate" }
 ];
 
 export const testimonials = [
   {
-    content: "This platform transformed our entire workflow. We're now 3x more productive and our team loves using it every day.",
-    name: "Sarah Johnson",
-    role: "Head of Operations, TechCorp",
-    avatar: "SJ",
+    content: "Tokebit Sonnet helped me create my first coin in minutes. The AI analysis was spot-on and my coin performed exactly as predicted!",
+    name: "Alex Rivera",
+    role: "Crypto Creator, DeFi Ventures",
+    avatar: "AR",
     rating: 5
   },
   {
-    content: "The automation features are incredible. We've saved hundreds of hours and eliminated manual errors completely.",
-    name: "Michael Chen",
-    role: "CEO, StartupXYZ",
-    avatar: "MC",
+    content: "I was just venting about market trends and Tokebot Mood turned it into a coin that went viral. This platform is pure magic!",
+    name: "Jordan Kim",
+    role: "Meme Coin Enthusiast",
+    avatar: "JK",
     rating: 5
   },
   {
-    content: "Best investment we've made for our business. The ROI was apparent within the first month of implementation.",
-    name: "Emily Rodriguez",
-    role: "Director, GlobalTech",
-    avatar: "ER",
+    content: "The Zora protocol integration is seamless. From concept to deployment in under 5 minutes - Tokonomy revolutionized my workflow.",
+    name: "Sam Chen",
+    role: "Blockchain Developer",
+    avatar: "SC",
     rating: 5
   }
 ];
 
-export const pricingPlans = [
-  {
-    name: "Starter",
-    price: "$29",
-    period: "/month",
-    description: "Perfect for small teams getting started",
-    features: [
-      "Up to 10 team members",
-      "Basic workflow automation",
-      "Email support",
-      "5GB storage",
-      "Mobile app access"
-    ],
-    popular: false
-  },
-  {
-    name: "Professional",
-    price: "$89",
-    period: "/month",
-    description: "Ideal for growing businesses",
-    features: [
-      "Up to 50 team members",
-      "Advanced automation",
-      "Priority support",
-      "50GB storage",
-      "API access",
-      "Custom integrations"
-    ],
-    popular: true
-  },
-  {
-    name: "Enterprise",
-    price: "Custom",
-    period: "",
-    description: "For large organizations",
-    features: [
-      "Unlimited team members",
-      "Enterprise features",
-      "24/7 dedicated support",
-      "Unlimited storage",
-      "On-premise deployment",
-      "Custom SLA"
-    ],
-    popular: false
-  }
-];
 
 export const partners = [
-  { name: "Microsoft", logo: "MS" },
-  { name: "Google", logo: "GG" },
-  { name: "Amazon", logo: "AWS" },
-  { name: "Salesforce", logo: "SF" },
-  { name: "Slack", logo: "SL" },
-  { name: "Zoom", logo: "ZM" },
-  { name: "Notion", logo: "NT" },
-  { name: "Stripe", logo: "ST" }
+  { name: "Zora", logo: "ZR" },
+  { name: "Ethereum", logo: "ETH" },
+  { name: "Base", logo: "BASE" },
+  { name: "Encode Club", logo: "ENC" },
+];
+
+export const aiChatbots = [
+  {
+    name: "Tokebit Sonnet",
+    type: "Basic Agent",
+    icon: <Bot className="w-8 h-8" />,
+    description: "Describe your coin parameters and let Sonnet create, search, and analyze coins with intelligent conversation.",
+    features: ["Parameter Description", "Coin Search", "Profile Discovery", "Basic Analysis"],
+    color: "from-blue-500 to-blue-600", 
+    url: '/chatbot'
+
+  },
+  {
+    name: "Tokebot Mood",
+    type: "Emotion-Based",
+    icon: <Sparkles className="w-8 h-8" />,
+    description: "Express yourself freely - rant, yap, or share your thoughts. Mood transforms emotions into coin parameters.",
+    features: ["Emotion Processing", "Auto-Parameter Generation", "One-Click Minting", "Mood Analysis"],
+    color: "from-purple-500 to-pink-600",
+    url: '/moodbot'
+  },
+  {
+    name: "Tokebot Prompt",
+    type: "Research Agent",
+    icon: <Rocket className="w-8 h-8" />,
+    description: "Research-driven coin creation optimized for viral potential and market trends analysis.",
+    features: ["Trend Research", "Viral Optimization", "Market Analysis", "Competition Study"],
+    color: "from-green-500 to-emerald-600",
+    url: '/promptbot'
+  }
+];
+
+export const coinFeatures = [
+  {
+    icon: <Zap className="w-5 h-5" />,
+    title: "Instant Deployment",
+    description: "Deploy on Zora protocol in seconds"
+  },
+  {
+    icon: <Shield className="w-5 h-5" />,
+    title: "Smart Contract Security",
+    description: "Battle-tested contract templates"
+  },
+  {
+    icon: <BarChart3 className="w-5 h-5" />,
+    title: "Success Prediction",
+    description: "AI-powered performance forecasting"
+  },
+  {
+    icon: <Users className="w-5 h-5" />,
+    title: "Community Building",
+    description: "Built-in social features"
+  }
 ];

@@ -32,88 +32,14 @@ import {
   BarChart3,
   Layers,
   Lock,
-  Smartphone
+  Smartphone,
+  Bot
 } from "lucide-react";
+import { RotatingGlobe } from '@/utils/rotatingGlobe';
 
-import { stats, features, testimonials, pricingPlans, partners } from "@/utils/constants/landingPageConstants";
-const RotatingGlobe = () => {
-  const [rotation, setRotation] = useState(0);
+import { stats, features, testimonials, partners , aiChatbots, coinFeatures} from "@/utils/constants/landingPageConstants";
+import Link from 'next/link';
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRotation(prev => (prev + 1) % 360);
-    }, 50);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="relative w-64 h-64 mx-auto mb-8">
-      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400 dark:from-gray-700 dark:via-gray-800 dark:to-gray-900 shadow-2xl">
-        <div 
-          className="absolute inset-2 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 overflow-hidden"
-          style={{ transform: `rotate(${rotation}deg)` }}
-        >
-          {/* Globe lines */}
-          <div className="absolute inset-0">
-            {/* Meridian lines */}
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute w-0.5 bg-gray-400 dark:bg-gray-600 opacity-30"
-                style={{
-                  height: '100%',
-                  left: `${(i * 12.5)}%`,
-                  transformOrigin: 'center',
-                  transform: `rotate(${i * 22.5}deg)`
-                }}
-              />
-            ))}
-            {/* Latitude lines */}
-            {[...Array(5)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute h-0.5 bg-gray-400 dark:bg-gray-600 opacity-30"
-                style={{
-                  width: '100%',
-                  top: `${(i + 1) * 16.66}%`,
-                  borderRadius: '50%',
-                  transform: `scaleX(${Math.sin((i + 1) * Math.PI / 6)})`
-                }}
-              />
-            ))}
-          </div>
-          
-          {/* Continents representation */}
-          <div className="absolute inset-0 overflow-hidden">
-            {/* Sample continent shapes */}
-            <div className="absolute w-8 h-6 bg-gray-500 dark:bg-gray-400 rounded-full opacity-40" style={{ top: '30%', left: '15%' }} />
-            <div className="absolute w-12 h-8 bg-gray-500 dark:bg-gray-400 rounded-full opacity-40" style={{ top: '40%', left: '45%' }} />
-            <div className="absolute w-6 h-10 bg-gray-500 dark:bg-gray-400 rounded-full opacity-40" style={{ top: '25%', left: '70%' }} />
-            <div className="absolute w-10 h-6 bg-gray-500 dark:bg-gray-400 rounded-full opacity-40" style={{ top: '60%', left: '20%' }} />
-          </div>
-        </div>
-        
-        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-transparent via-white/10 to-transparent dark:via-white/5 pointer-events-none" />
-      </div>
-      
-      {/* Floating particles */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(6)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full opacity-30 animate-pulse"
-            style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${i * 0.5}s`,
-              animationDuration: `${2 + Math.random() * 2}s`
-            }}
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
 
 export default function EnhancedLandingPage() {
   const [scrollY, setScrollY] = useState(0);
@@ -128,7 +54,6 @@ export default function EnhancedLandingPage() {
     <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white overflow-x-hidden">
     
       <section className="relative pt-20 pb-16 px-4 sm:px-6 lg:px-8">
-        {/* Animated background */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-gray-100/20 to-transparent dark:from-gray-900/20 rotate-12 transform" />
           <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-gray-100/20 to-transparent dark:from-gray-900/20 -rotate-12 transform" />
@@ -138,20 +63,19 @@ export default function EnhancedLandingPage() {
           <div className="text-center max-w-4xl mx-auto">
             <Badge variant="secondary" className="mb-6 bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-800 transition-all duration-300 animate-pulse">
               <Rocket className="w-4 h-4 mr-2" />
-              Tokenise digital assets and experiences using AI 
+              Tokenise digital assets and experiences using AI and Zora protocol 
             </Badge>
-            
             <RotatingGlobe />
             
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Transform Your
+              Tokenise 
               <span className="block bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent animate-pulse">
-                Vision of life
+                Everything and Anything
               </span>
             </h1>
             
             <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 mb-8 leading-relaxed max-w-3xl mx-auto">
-              Connect teams worldwide with intelligent automation. Streamline processes, boost productivity, and achieve more with our cutting-edge platform designed for global excellence.
+              Tokonomy revolutionizes token creation through AI-powered automation, offering three specialized chatbots that transform everything from detailed specifications to spontaneous rants into ready-to-mint coins on the Zora protocol. Whether you need precise control with Tokebot Sonnet, emotional expression through Tokebot Mood, or viral optimization via Tokebot Prompt, our platform delivers predictive success analysis and seamless deployment while connecting creators through profile exploration and trending coin discovery.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
@@ -159,7 +83,9 @@ export default function EnhancedLandingPage() {
                 size="lg" 
                 className="bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 px-8 py-4 text-lg transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-2xl group"
               >
-                Start Free Trial
+                <Link href="https://docs.zora.co/" target="_blank">
+                Check Zora Protocol docs 
+                </Link>
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button 
@@ -190,6 +116,7 @@ export default function EnhancedLandingPage() {
       </section>
 
       {/* Partners Section */}
+      {/* Partners Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-950">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
@@ -204,20 +131,27 @@ export default function EnhancedLandingPage() {
               We collaborate with the world's most innovative companies to deliver exceptional experiences.
             </p>
           </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6">
-            {partners.map((partner, index) => (
-              <div key={index} className="group">
-                <div className="w-full h-16 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg flex items-center justify-center hover:shadow-lg transition-all duration-300 hover:scale-105 group-hover:border-gray-400 dark:group-hover:border-gray-600">
-                  <div className="w-12 h-12 bg-gray-100 dark:bg-gray-900 rounded-lg flex items-center justify-center text-sm font-bold text-gray-600 dark:text-gray-400 group-hover:bg-black group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-black transition-all duration-300">
-                    {partner.logo}
+
+          <div className="flex justify-center">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-6">
+              {partners.map((partner, index) => (
+                <div key={index} className="flex flex-col items-center group text-center">
+                  <div className="w-full h-16 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg flex items-center justify-center hover:shadow-lg transition-all duration-300 hover:scale-105 group-hover:border-gray-400 dark:group-hover:border-gray-600">
+                    <div className="w-12 h-12 bg-gray-100 dark:bg-gray-900 rounded-lg flex items-center justify-center text-sm font-bold text-gray-600 dark:text-gray-400 group-hover:bg-black group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-black transition-all duration-300">
+                      {partner.logo}
+                    </div>
                   </div>
+                  <p className="mt-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {partner.name}
+                  </p>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
+
+
 
       {/* Features Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
@@ -247,6 +181,98 @@ export default function EnhancedLandingPage() {
                 </CardHeader>
                 <CardContent className="relative z-10">
                   <CardDescription className="text-gray-600 dark:text-gray-400 text-base leading-relaxed group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
+                    {feature.description}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* AI Chatbots Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-950">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <Badge variant="outline" className="mb-4 border-gray-300 dark:border-gray-700">
+              <Bot className="w-4 h-4 mr-2" />
+              AI Chatbots
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Intelligent Coin Creation Assistants
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
+              Choose from our AI-powered chatbots to create, analyze, and optimize your coins with different approaches.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {aiChatbots.map((bot, index) => (
+              <Card key={index} className="border-gray-200 dark:border-gray-800 bg-white dark:bg-black hover:shadow-2xl transition-all duration-500 hover:scale-105 group relative overflow-hidden">
+                <div className={`absolute inset-0 bg-gradient-to-br ${bot.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
+                <CardHeader className="relative z-10">
+                  <div className={`w-16 h-16 bg-gradient-to-br ${bot.color} rounded-xl flex items-center justify-center mb-4 text-white shadow-lg group-hover:scale-110 transition-all duration-300`}>
+                    {bot.icon}
+                  </div>
+                  <Badge variant="secondary" className="w-fit mb-2 text-xs">
+                    {bot.type}
+                  </Badge>
+                  <CardTitle className="text-2xl mb-2 group-hover:text-black dark:group-hover:text-white transition-colors">{bot.name}</CardTitle>
+                </CardHeader>
+                <CardContent className="relative z-10">
+                  <CardDescription className="text-gray-600 dark:text-gray-400 text-base leading-relaxed mb-6 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
+                    {bot.description}
+                  </CardDescription>
+                  <div className="space-y-2 mb-6">
+                    {bot.features.map((feature, featureIndex) => (
+                      <div key={featureIndex} className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                        <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
+                        {feature}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <Button className={`w-full bg-gradient-to-r ${bot.color} text-white border-0 hover:shadow-lg transition-all duration-300 group-hover:scale-105`}>
+                   <Link href={bot.url} target="_blank" rel="noopener noreferrer">
+                    Try {bot.name}
+                   </Link>
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
+                  
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Coin Features Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <Badge variant="outline" className="mb-4 border-gray-300 dark:border-gray-700">
+              <Zap className="w-4 h-4 mr-2" />
+              Coin Features
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Built for Success
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
+              Every coin created with our platform comes with powerful features designed to maximize your success potential.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {coinFeatures.map((feature, index) => (
+              <Card key={index} className="border-gray-200 dark:border-gray-800 bg-white dark:bg-black hover:shadow-2xl transition-all duration-500 hover:scale-105 group text-center">
+                <CardHeader>
+                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-900 rounded-xl flex items-center justify-center mb-4 group-hover:bg-black group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-black transition-all duration-300 mx-auto group-hover:scale-110">
+                    {feature.icon}
+                  </div>
+                  <CardTitle className="text-lg mb-2 group-hover:text-black dark:group-hover:text-white transition-colors">{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
                     {feature.description}
                   </CardDescription>
                 </CardContent>
@@ -301,72 +327,9 @@ export default function EnhancedLandingPage() {
           </div>
         </div>
       </section>
-
-      {/* Pricing Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <Badge variant="outline" className="mb-4 border-gray-300 dark:border-gray-700">
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Pricing
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Simple, Transparent Pricing
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              Choose the plan that fits your global team's needs. All plans include our core features with no hidden fees.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {pricingPlans.map((plan, index) => (
-              <Card key={index} className={`border-gray-200 dark:border-gray-800 bg-white dark:bg-black hover:shadow-2xl transition-all duration-500 relative overflow-hidden ${
-                plan.popular ? 'ring-2 ring-black dark:ring-white scale-105 shadow-xl' : 'hover:scale-105'
-              }`}>
-                {plan.popular && (
-                  <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-black dark:bg-white text-white dark:text-black animate-pulse">
-                    <Star className="w-4 h-4 mr-1" />
-                    Most Popular
-                  </Badge>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-50/30 via-transparent to-gray-50/30 dark:from-gray-900/30 dark:to-gray-900/30 opacity-0 hover:opacity-100 transition-opacity duration-500" />
-                <CardHeader className="text-center relative z-10">
-                  <CardTitle className="text-xl mb-2">{plan.name}</CardTitle>
-                  <div className="flex items-baseline justify-center">
-                    <span className="text-4xl font-bold">{plan.price}</span>
-                    <span className="text-gray-600 dark:text-gray-400 ml-1">{plan.period}</span>
-                  </div>
-                  <CardDescription className="text-gray-600 dark:text-gray-400 mt-2">
-                    {plan.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4 relative z-10">
-                  <ul className="space-y-3">
-                    {plan.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-center space-x-2">
-                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button 
-                    className={`w-full mt-6 transition-all duration-300 hover:scale-105 ${
-                      plan.popular 
-                        ? 'bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 shadow-lg' 
-                        : 'bg-gray-100 dark:bg-gray-900 text-black dark:text-white hover:bg-gray-200 dark:hover:bg-gray-800'
-                    }`}
-                  >
-                    {plan.name === 'Enterprise' ? 'Contact Sales' : 'Get Started'}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      
       {/* Contact Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-950">
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <Badge variant="outline" className="mb-4 border-gray-300 dark:border-gray-700">
@@ -431,20 +394,20 @@ export default function EnhancedLandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-950">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Ready to Transform Your Global Workflow?
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-            Join thousands of teams worldwide who have already revolutionized their productivity. Start your free trial today.
+            Join thousands of teams worldwide who have already revolutionized their productivity. 
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button 
               size="lg" 
               className="bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 px-8 py-4 text-lg transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-2xl group"
             >
-              Start Free Trial
+              Backed by Zora
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button 
@@ -460,7 +423,7 @@ export default function EnhancedLandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800">
+      <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-gray-200 dark:border-gray-800">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="col-span-2">
@@ -468,7 +431,7 @@ export default function EnhancedLandingPage() {
                 <div className="w-8 h-8 bg-black dark:bg-white rounded-lg flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-white dark:text-black" />
                 </div>
-                <span className="text-xl font-bold">Nexus</span>
+                <span className="text-xl font-bold">Tokonomy</span>
               </div>
               <p className="text-gray-600 dark:text-gray-400 max-w-md leading-relaxed mb-6">
                 Empowering global teams to achieve more through intelligent workflow automation and seamless collaboration across continents.
