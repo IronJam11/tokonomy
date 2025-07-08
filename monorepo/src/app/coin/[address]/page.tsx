@@ -338,7 +338,7 @@ export default function CoinDetailsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MessageCircle className="w-5 h-5" />
-              Community Comments
+              Community Comments and Trade
             </CardTitle>
             <CardDescription>
               View community discussions about {coin.name}
@@ -358,7 +358,9 @@ export default function CoinDetailsPage() {
               </Button>
               <Button onClick={fetchAllComments} disabled={commentsLoading}>
                 {commentsLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                Load All Comments
+                <Link href={`/trade-coin/${coinAddress}`}>
+                Trade
+                </Link>
               </Button>
             </div>
             
