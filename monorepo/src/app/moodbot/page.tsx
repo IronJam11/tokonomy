@@ -237,7 +237,7 @@ const sendMessage = async () => {
                   </div>
                   <div>
                     <h1 className="font-bold text-gray-900 dark:text-white text-xl bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                      MoodBot ✨
+                      Tokebot Mood ✨
                     </h1>
                     <div className="flex items-center space-x-2">
                       <div className="h-2 w-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse"></div>

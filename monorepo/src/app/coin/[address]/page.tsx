@@ -257,7 +257,6 @@ export default function CoinDetailsPage() {
         </Alert>
       )}
 
-      {/* Loading State */}
       {loading && (
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
@@ -267,7 +266,6 @@ export default function CoinDetailsPage() {
         </div>
       )}
 
-      {/* Coin Details */}
       {coin && !loading && (
         <Card className="mb-8">
           <CardHeader>
@@ -335,8 +333,6 @@ export default function CoinDetailsPage() {
           </CardContent>
         </Card>
       )}
-
-      {/* Comments Section */}
       {coin && (
         <Card>
           <CardHeader>

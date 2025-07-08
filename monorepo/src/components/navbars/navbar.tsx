@@ -43,6 +43,11 @@ export function Navbar() {
       description: "Tokenise your thoughts"
     },
     {
+      href: "/prompt-bot",
+      title: "Tokebot Prompt",
+      description: "Make the next viral token"
+    },
+    {
       href: "/profile",
       title: "Profile",
       description: "View your profile"

@@ -67,8 +67,9 @@ const mainNavItems = [
     icon: BatteryPlusIcon,
     url: "/chatbot",
     items: [
-      { title: "Chatbot Sonnet", url: "/chatbot" },
-      { title: "Chatbot moodVersion", url: "/moodbot" },
+      { title: "Sonnet", url: "/chatbot" },
+      { title: "Mood", url: "/moodbot" },
+      { title: "Prompt", url: "/prompt-bot" },
     ],
   },
   {
