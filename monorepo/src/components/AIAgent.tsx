@@ -114,6 +114,7 @@ const AIAgent: React.FC<AIAgentProps> = ({
           timestamp: new Date() 
         };
         setMessages(prev => [...prev, errorMessage]);
+        window.location.reload();
       }, 1000);
     } finally {
       setIsLoading(false);

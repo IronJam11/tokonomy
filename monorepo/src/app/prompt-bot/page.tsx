@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useModal } from '@/providers/ModalProvider';
+import { toast } from 'react-hot-toast';
 
 interface Message {
   text: string;
@@ -17,31 +18,54 @@ const formatTime = (date: Date): string => {
 };
 
 const renderMessageContent = (text: string, isUser: boolean) => {
-  // Simple markdown-like rendering for links and basic formatting
-  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-  const parts = text.split(linkRegex);
-  
-  return parts.map((part, index) => {
-    if (index % 3 === 1) {
-      return (
-        <a
-          key={index}
-          href={parts[index + 1]}
-          className={`underline hover:opacity-80 ${
-            isUser ? 'text-blue-600 dark:text-blue-400' : 'text-blue-300 dark:text-blue-500'
-          }`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {part}
-        </a>
-      );
-    } else if (index % 3 === 2) {
-      return null;
-    } else {
-      return part;
+  try {
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+
+    // Check for empty text
+    if (text.trim() === '') {
+      toast.error('Server error');
     }
-  });
+
+    if (!linkRegex.test(text)) {
+      return text;
+    }
+    linkRegex.lastIndex = 0;
+    
+    const parts = text.split(linkRegex);
+    if (parts.length === 1) {
+      toast.error('Server error');
+    }
+    if (parts.length % 3 !== 1) {
+      throw new Error('Malformed message content - unbalanced markdown links');
+    }
+
+    return parts.map((part, index) => {
+      if (index % 3 === 1) {
+        return (
+          <a
+            key={index}
+            href={parts[index + 1]}
+            className={`underline hover:opacity-80 ${
+              isUser ? 'text-blue-600 dark:text-blue-400' : 'text-blue-300 dark:text-blue-500'
+            }`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {part}
+          </a>
+        );
+      } else if (index % 3 === 2) {
+        return null;
+      } else {
+        return part;
+      }
+    });
+  } catch (error: string | any) {
+    console.error('Error rendering message content:', error);
+    alert(`Error displaying message: ${error.message}`);
+    window.location.reload();
+    return text;
+  }
 };
 
 export default function ChatbotPage() {
