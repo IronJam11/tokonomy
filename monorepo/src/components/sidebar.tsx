@@ -50,7 +50,6 @@ const mainNavItems = [
     url: "/users",
     items: [
       { title: "Profile (Me)", url: "/profile" },
-      { title: "User Profile Search", url: "/users/new" }
     ],
   },
   {
