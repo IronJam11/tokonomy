@@ -1,10 +1,11 @@
-# Tokonomy
+
+![tokonomy-logo](https://github.com/user-attachments/assets/1fee00ac-91a2-48b1-9bc7-3beff2031f29)
 
 **Create coins from conversations — AI-powered token generation built on the Zora protocol.**
 
 Tokonomy reimagines the way tokens are created. Instead of filling out technical forms or writing smart contracts, users simply express their ideas, emotions, or strategies — and our AI agents handle the rest. Whether you're a creator with a vision, a user with a feeling, or a strategist chasing trends, Tokonomy turns your input into real, deployable tokens using Zora’s CoinV4 infrastructure.
 
-Deployed on **[Vercel](https://vercel.com)** for lightning-fast performance and seamless user experience.
+Deployed on **[Vercel](https://tokonomy.vercel.app/)** for lightning-fast performance and seamless user experience.
 
 ---
 
@@ -27,6 +28,8 @@ It enables **direct exchange of value** between creators and supporters. Now, a 
 ### AI-Driven Token Creation Workflows
 
 **Tokonomy offers three specialized AI agents to help you create tokens in different ways:**
+
+<img width="1470" alt="image" src="https://github.com/user-attachments/assets/f9db0e3a-f92b-43c7-82c9-05ae1efbf2cf" />
 
 #### Tokebot Sonnet — Parameter-Based Coin Creation
 
@@ -113,7 +116,7 @@ Tokonomy includes features for discovering other creators, coins, and emerging t
 ```bash
 # Clone the repo
 git clone https://github.com/your-username/tokonomy.git
-cd tokonomy
+cd tokonomy/monorepo
 
 # Install dependencies
 npm install
