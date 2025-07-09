@@ -67,6 +67,7 @@ export default function CreateCoinModal({
   const chainId = useChainId();
   const [CoinPredictionAnalysis, setCoinPredictionAnalysis] = useState<CoinPredictiveAnalysis | null>(null); 
   const [CoinAnalysis, setCoinAnalysis] = useState<CoinAnalysis | null>(null);
+  const [successShown, setSuccessShown] = useState(false);
   const simulationConfig = useMemo(() => {
     if (!contractCallParams || !address || !isConnected) {
       return { enabled: false };
@@ -102,7 +103,6 @@ export default function CreateCoinModal({
       : { hash: undefined }
   );
 
-  // Stable callback functions
   const addLink = useCallback(() => {
     setLinks(prev => [...prev, { platform: "", url: "" }]);
   }, []);
@@ -320,26 +320,33 @@ export default function CreateCoinModal({
       previousSimulationError.current = null;
     }
   }, [isOpen, initialData]);
-
-  // Effect to handle successful receipt
-  useEffect(() => {
-    if (isReceiptSuccess && receipt && txHash && !hasProcessedReceipt.current) {
-      hasProcessedReceipt.current = true;
-      try {
-        const coinDeployment = getCoinCreateFromLogs(receipt);
-        if (coinDeployment?.coin) {
-          setDeployedCoinAddress(coinDeployment.coin);
-          toast.success(`🎉 Coin created successfully! Deployed at ${coinDeployment.coin}`);
-          setTimeout(() => handleClose(), 2000);
+useEffect(() => {
+  if (isReceiptSuccess && receipt && txHash && !hasProcessedReceipt.current) {
+    hasProcessedReceipt.current = true;
+    
+    try {
+      const coinDeployment = getCoinCreateFromLogs(receipt);
+      if (coinDeployment?.coin) {
+        setDeployedCoinAddress(coinDeployment.coin);
+        
+        // Use toastIds ref to track shown toasts
+        const toastId = `success-${txHash}`;
+        if (!toastIds.current[toastId]) {
+          toastIds.current[toastId] = toast.success(
+            `🎉 Coin created successfully! Deployed at ${coinDeployment.coin}`,
+            { id: toastId }
+          );
         }
-      } catch (error) {
-        console.error("Error extracting coin address:", error);
-        toast.error("❌ Error creating coin");
-      }
-    }
-  }, [isReceiptSuccess, receipt, txHash, handleClose]);
 
-  // Effect to handle transaction errors
+        setTimeout(() => handleClose(), 2000);
+      }
+    } catch (error) {
+      console.error("Error extracting coin address:", error);
+      toast.error("❌ Error creating coin");
+    }
+  }
+}, [isReceiptSuccess, receipt, txHash, handleClose]);
+
   useEffect(() => {
     if (isWriteError && writeError && !hasProcessedError.current) {
       hasProcessedError.current = true;
